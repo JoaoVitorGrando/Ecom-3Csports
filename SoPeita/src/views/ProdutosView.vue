@@ -22,21 +22,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getAllProducts } from '../services/productService'
+import { onMounted, computed } from 'vue'
+import { useProductsStore } from '@/stores/products'
+import { showToast } from '@/utils/toast'
 
-const produtos = ref([])
-const loading = ref(true)
-const erro = ref('')
+const productsStore = useProductsStore()
+const produtos = computed(() => productsStore.products)
+const loading = computed(() => productsStore.loading)
+const erro = computed(() => productsStore.error)
 
 onMounted(async () => {
   try {
-    produtos.value = await getAllProducts()
-    erro.value = ''
+    await productsStore.fetchProducts()
   } catch (e) {
-    erro.value = 'Erro ao carregar produtos.'
-  } finally {
-    loading.value = false
+    showToast('Erro ao carregar produtos.', 'error')
   }
 })
 </script>

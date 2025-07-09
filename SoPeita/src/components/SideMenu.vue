@@ -49,15 +49,17 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { getUser, logout as authLogout } from '../services/authService'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close'])
 
+const auth = useAuthStore()
 const router = useRouter()
-const user = computed(() => getUser())
-const isAuth = computed(() => !!user.value)
-const isAdmin = computed(() => user.value?.role === 'ADMIN')
+
+const user = computed(() => auth.user)
+const isAdmin = computed(() => auth.role === 'ADMIN')
+const isAuth = computed(() => !!auth.token)
 
 function close() {
   emit('close')
@@ -73,9 +75,8 @@ function navigate(path) {
   }
 }
 function logout() {
-  authLogout()
-  close()
-  router.push('/')
+  auth.logout()
+  router.push('/login')
 }
 </script>
 

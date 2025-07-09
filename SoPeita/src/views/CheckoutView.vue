@@ -84,13 +84,13 @@
         <div class="card border-0 p-4 shadow-sm sticky-top resumo-pedido">
           <h4 class="fw-bold mb-4">Resumo do Pedido</h4>
           <div v-if="loading">Carregando...</div>
-          <div v-else-if="error">{{ error }}</div>
+          <div v-else-if="erro">{{ erro }}</div>
           <div v-else>
-            <div v-for="item in cart" :key="item.id" class="d-flex align-items-center mb-3">
-              <img :src="item.produto?.imagem || ''" :alt="item.produto?.nome || ''" class="resumo-img me-3" />
+            <div v-for="item in items" :key="item.id" class="d-flex align-items-center mb-3">
+              <img :src="item.product?.image || ''" :alt="item.product?.name || ''" class="resumo-img me-3" />
               <div class="flex-grow-1">
-                <div class="fw-semibold">{{ item.produto?.nome }}</div>
-                <div class="small">R$ {{ item.produto?.preco?.toFixed(2) }} x {{ item.quantidade }}</div>
+                <div class="fw-semibold">{{ item.product?.name }}</div>
+                <div class="small">R$ {{ Number(item.product?.price).toFixed(2) }} x {{ item.quantity }}</div>
               </div>
             </div>
             <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-4">
@@ -106,7 +106,10 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { getCart } from '../services/cartService'
+import { useCartStore } from '@/stores/cart'
+import { useOrdersStore } from '@/stores/orders'
+import { useAddressesStore } from '@/stores/addresses'
+import { showToast } from '@/utils/toast'
 
 const nome = ref('')
 const email = ref('')
@@ -118,27 +121,36 @@ const telefone = ref('')
 const pagamento = ref('cartao')
 const cartao = ref({ numero: '', validade: '', cvv: '', nome: '' })
 const compraFinalizada = ref(false)
-const cart = ref([])
-const loading = ref(true)
-const error = ref('')
+
+const cartStore = useCartStore()
+const ordersStore = useOrdersStore()
+const addressesStore = useAddressesStore()
+
+const loading = computed(() => cartStore.loading)
+const erro = computed(() => cartStore.error)
+const items = computed(() => cartStore.items)
 
 onMounted(async () => {
-  try {
-    cart.value = await getCart()
-  } catch (e) {
-    error.value = 'Erro ao carregar carrinho.'
-  } finally {
-    loading.value = false
-  }
+  await cartStore.fetchItems()
 })
 
 const total = computed(() => {
-  return cart.value.reduce((sum, item) => sum + (item.produto?.preco || 0) * item.quantidade, 0)
+  return items.value.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
 })
 
-function finalizarCompra() {
-  compraFinalizada.value = true
-  setTimeout(() => compraFinalizada.value = false, 2500)
+async function finalizarCompra() {
+  try {
+    await ordersStore.createOrder({
+      items: items.value.map(item => ({ product_id: item.product.id, quantity: item.quantity })),
+      address: { nome: nome.value, email: email.value, endereco: endereco.value, cep: cep.value, cidade: cidade.value, uf: uf.value, telefone: telefone.value },
+      payment: pagamento.value
+    })
+    showToast('Compra finalizada com sucesso!', 'success')
+    await cartStore.clearItems()
+    compraFinalizada.value = true
+  } catch (e) {
+    showToast('Erro ao finalizar compra: ' + (e?.detail || e?.message || 'Erro interno'), 'error')
+  }
 }
 </script>
 

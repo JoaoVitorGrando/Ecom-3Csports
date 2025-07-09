@@ -24,20 +24,29 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login } from '../services/authService'
+import { login } from '@/services/HttpService'
+import { useAuthStore } from '@/stores/auth'
+import { showToast } from '@/utils/toast'
 
 const email = ref('')
 const senha = ref('')
 const error = ref('')
 const router = useRouter()
+const auth = useAuthStore()
 
 async function handleLogin() {
   try {
-    await login(email.value, senha.value)
-    window.dispatchEvent(new Event('storage'))
+    const data = await login({ email: email.value, password: senha.value })
+    auth.token = data.token
+    auth.user = data.user
+    auth.role = data.user.role
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('role', data.user.role)
+    showToast('Login realizado com sucesso!', 'success')
     router.push('/')
   } catch (e) {
     error.value = 'Login inválido!'
+    showToast('Erro ao fazer login: ' + (e?.detail || e?.message || 'Erro interno'), 'error')
   }
 }
 </script> 

@@ -11,7 +11,7 @@
       <div class="col-12 col-md-6">
         <h1 class="fw-bold mb-2">{{ product.name }}</h1>
         <div class="d-flex align-items-center gap-3 mb-3">
-          <span class="price display-5 fw-bold text-success">R$ {{ product.price.toFixed(2) }}</span>
+          <span class="price display-5 fw-bold text-success">R$ {{ Number(product.price).toFixed(2) }}</span>
         </div>
         <div class="mb-4">
           <span class="text-muted">Camiseta 100% algodão, confortável e estilosa. Estampa exclusiva soPeita.</span>
@@ -47,57 +47,38 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCartStore } from '../stores/cart'
+import { useProductsStore } from '@/stores/products'
+import { useCartStore } from '@/stores/cart'
+import { showToast } from '@/utils/toast'
 
 const route = useRoute()
+const productsStore = useProductsStore()
 const cartStore = useCartStore()
 
-const products = [
-  {
-    id: 1,
-    name: 'Camisa Palmeiras 2024',
-    price: 299.90,
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=600&q=80',
-    escudo: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg',
-    oficial: true
-  },
-  {
-    id: 2,
-    name: 'Camisa Flamengo 2024',
-    price: 289.90,
-    image: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?auto=format&fit=crop&w=600&q=80',
-    escudo: 'https://upload.wikimedia.org/wikipedia/commons/1/16/CRF_logo.svg',
-    oficial: true
-  },
-  {
-    id: 3,
-    name: 'Camisa Corinthians 2024',
-    price: 279.90,
-    image: 'https://images.unsplash.com/photo-1505843276871-1b43c1e1e6c4?auto=format&fit=crop&w=600&q=80',
-    escudo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Corinthians_logo.svg',
-    oficial: true
-  },
-  {
-    id: 4,
-    name: 'Camisa São Paulo 2024',
-    price: 269.90,
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80',
-    escudo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Sao_Paulo_FC_logo.svg',
-    oficial: true
-  }
-]
-
-const product = products.find(p => p.id === Number(route.params.id))
+const product = ref(null)
 const sizes = ['P', 'M', 'G', 'GG']
 const selectedSize = ref('M')
 const showMsg = ref(false)
 
-function addToCart() {
-  cartStore.addToCart({ ...product, size: selectedSize.value })
-  showMsg.value = true
-  setTimeout(() => showMsg.value = false, 1500)
+onMounted(async () => {
+  try {
+    product.value = await productsStore.fetchProduct(route.params.id)
+  } catch (e) {
+    showToast('Erro ao carregar produto.', 'error')
+  }
+})
+
+async function addToCart() {
+  try {
+    await cartStore.addItem(product.value.id, 1)
+    showMsg.value = true
+    showToast('Produto adicionado ao carrinho!', 'success')
+    setTimeout(() => showMsg.value = false, 1500)
+  } catch (e) {
+    showToast('Erro ao adicionar ao carrinho.', 'error')
+  }
 }
 </script>
 

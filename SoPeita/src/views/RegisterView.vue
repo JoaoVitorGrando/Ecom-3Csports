@@ -29,8 +29,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { login } from '../services/authService'
+import { register, login } from '@/services/HttpService'
+import { useAuthStore } from '@/stores/auth'
+import { showToast } from '@/utils/toast'
 
 const nome = ref('')
 const email = ref('')
@@ -38,23 +39,25 @@ const senha = ref('')
 const error = ref('')
 const success = ref(false)
 const router = useRouter()
+const auth = useAuthStore()
 
 async function handleRegister() {
   error.value = ''
   success.value = false
   try {
-    await axios.post('http://35.196.79.227:8000/register', {
-      name: nome.value,
-      email: email.value,
-      password: senha.value
-    }, {
-      headers: { 'Content-Type': 'application/json' }
-    })
-    await login(email.value, senha.value)
-    success.value = true
+    await register({ name: nome.value, email: email.value, password: senha.value })
+    // Login automático após registro
+    const data = await login({ email: email.value, password: senha.value })
+    auth.token = data.token
+    auth.user = data.user
+    auth.role = data.user.role
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('role', data.user.role)
+    showToast('Usuário registrado com sucesso!', 'success')
     setTimeout(() => router.push('/'), 1500)
   } catch (e) {
-    error.value = e.response?.data?.detail || 'Erro ao registrar usuário.'
+    error.value = e?.detail || e?.message || 'Erro ao registrar usuário.'
+    showToast('Erro ao registrar: ' + error.value, 'error')
   }
 }
 </script> 

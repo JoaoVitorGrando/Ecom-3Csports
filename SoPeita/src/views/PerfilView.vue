@@ -28,44 +28,35 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
+import { showToast } from '@/utils/toast'
 
 const nome = ref('')
 const email = ref('')
 const role = ref('')
 const sucesso = ref(false)
+const auth = useAuthStore()
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem('token')
-    const response = await axios.get('http://35.196.79.227:8000/users/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    const user = response.data
-    nome.value = user.nome || user.name || ''
-    email.value = user.email || ''
-    role.value = user.role || ''
+    await auth.fetchProfile()
+    nome.value = auth.user?.name || ''
+    email.value = auth.user?.email || ''
+    role.value = auth.user?.role || ''
   } catch (e) {
-    alert('Erro ao carregar dados do perfil.')
+    showToast('Erro ao carregar dados do perfil.', 'error')
   }
 })
 
 async function salvar() {
   try {
-    const token = localStorage.getItem('token')
-    const response = await axios.put('http://35.196.79.227:8000/users/me', {
-      name: nome.value,
-      email: email.value
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    const user = response.data
-    localStorage.setItem('user', JSON.stringify(user))
-    window.dispatchEvent(new Event('storage'))
+    await auth.fetchProfile()
+    await auth.$patch({ user: { ...auth.user, name: nome.value, email: email.value } })
     sucesso.value = true
+    showToast('Dados atualizados com sucesso!', 'success')
     setTimeout(() => sucesso.value = false, 2000)
   } catch (e) {
-    alert('Erro ao atualizar perfil.')
+    showToast('Erro ao atualizar perfil.', 'error')
   }
 }
 </script> 
