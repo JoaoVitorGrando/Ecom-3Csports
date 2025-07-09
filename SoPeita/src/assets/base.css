@@ -1,0 +1,115 @@
+:root {
+  --color-bg: #f7f8fa;
+  --color-bg-card: #fff;
+  --color-text: #222;
+  --color-primary: #21ba45;
+  --color-primary-dark: #176d2c;
+  --color-border: #eaeaea;
+  --color-shadow: 0 0px 0px rgba(0,0,0,0);
+  --color-shadow-strong: 0 0px 0px rgba(0,0,0,0);
+  --color-footer: #fff;
+  --color-link: #21ba45;
+  --color-link-hover: #176d2c;
+}
+[data-theme="dark"] {
+  --color-bg: #181a1b;
+  --color-bg-card: #23272b;
+  --color-text: #f7f8fa;
+  --color-primary: #21ba45;
+  --color-primary-dark: #176d2c;
+  --color-border: #23272b;
+  --color-shadow: 0 0px 0px rgba(0,0,0,0);
+  --color-shadow-strong: 0 0px 0px rgba(0,0,0,0);
+  --color-footer: #181a1b;
+  --color-link: #21ba45;
+  --color-link-hover: #fff;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  background: var(--color-bg) !important;
+  color: var(--color-text);
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+body {
+  min-height: 100vh;
+  width: 100vw;
+  background: var(--color-bg) !important;
+  transition: background 0.3s;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--color-link-hover);
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: 1px;
+}
+p {
+  margin: 0 0 12px 0;
+}
+button, .btn {
+  font-family: inherit;
+  font-size: 1.1rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 2rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+  font-weight: 700;
+  padding: 0.75rem 2rem;
+  box-shadow: var(--color-shadow);
+}
+.btn-success, .btn-success:focus {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+}
+.btn-success:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 1.5rem;
+  border: 1px solid #ddd;
+  padding: 8px 18px;
+  outline: none;
+  transition: border 0.2s;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-primary);
+}
+.card, .shadow-sm {
+  box-shadow: var(--color-shadow) !important;
+  border-radius: 2rem !important;
+  border: none !important;
+  background: var(--color-bg-card) !important;
+  color: var(--color-text) !important;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+@media (max-width: 700px) {
+  html, body {
+    font-size: 15px;
+  }
+  .btn, button {
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+  }
+}
