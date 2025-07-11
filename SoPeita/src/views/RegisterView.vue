@@ -29,7 +29,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { register, login } from '@/services/HttpService'
+import { register } from '@/services/HttpService'
 import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
 
@@ -47,12 +47,7 @@ async function handleRegister() {
   try {
     await register({ name: nome.value, email: email.value, password: senha.value })
     // Login automático após registro
-    const data = await login({ email: email.value, password: senha.value })
-    auth.token = data.token
-    auth.user = data.user
-    auth.role = data.user.role
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('role', data.user.role)
+    await auth.login(email.value, senha.value)
     showToast('Usuário registrado com sucesso!', 'success')
     setTimeout(() => router.push('/'), 1500)
   } catch (e) {

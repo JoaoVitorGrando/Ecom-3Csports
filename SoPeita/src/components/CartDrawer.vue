@@ -95,24 +95,27 @@ function close() { cartDrawer.closeDrawer() }
 .cart-drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(30,30,30,0.55);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   z-index: 3000;
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  transition: background 0.45s cubic-bezier(.4,2,.3,1);
+  transition: all 0.3s ease;
 }
+
 .cart-drawer {
-  background: var(--color-bg, #fff);
+  background: var(--color-bg-card);
   width: 100%;
   max-width: 410px;
   height: 100vh;
-  box-shadow: -8px 0 32px rgba(0,0,0,0.10);
+  box-shadow: var(--color-shadow-strong);
   display: flex;
   flex-direction: column;
   padding: 32px 24px 24px 24px;
   position: relative;
-  animation: slideInCart 0.55s cubic-bezier(.4,1.6,.3,1);
+  animation: slideInCart 0.4s ease-out;
+  border-left: 1px solid var(--color-border);
 }
 @keyframes slideInCart {
   from { transform: translateX(100%); opacity: 0.5; }
@@ -135,20 +138,22 @@ function close() { cartDrawer.closeDrawer() }
   margin-bottom: 2rem;
 }
 .cart-item {
-  background: #f8f9fa;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(33,186,69,0.07);
-  padding: 0.8rem 1rem;
+  background: var(--color-bg);
+  border-radius: 12px;
+  box-shadow: var(--color-shadow);
+  padding: 16px;
   display: flex;
   align-items: center;
-  margin-bottom: 1.2rem;
-  transition: background 0.2s, box-shadow 0.2s;
-  border: 1.5px solid #e9ecef;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-border);
 }
+
 .cart-item:hover {
-  background: #f1fff4;
-  box-shadow: 0 4px 18px rgba(33,186,69,0.13);
-  border-color: #21ba45;
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: var(--color-shadow-hover);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
 }
 .cart-img {
   width: 76px;
@@ -168,7 +173,7 @@ function close() { cartDrawer.closeDrawer() }
 }
 .cart-item .fw-semibold {
   font-size: 1.13rem;
-  color: #21ba45;
+  color: var(--color-primary);
   margin-top: 0.2rem;
 }
 .btn-remove {

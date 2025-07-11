@@ -19,7 +19,7 @@ API.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const auth = useAuthStore()
       auth.logout()
-      window.location.href = '/login'
+      // Remover window.location.href = '/login' para evitar loop de reload
     }
     return Promise.reject(error)
   }
@@ -40,6 +40,18 @@ export async function registerModerator(payload) {
 
 export async function getUser() {
   return (await API.get('users/me')).data
+}
+
+// Adicionar função para buscar todos os usuários
+export async function getAllUsers() {
+  try {
+    const res = await API.get('users/')
+    console.log('getAllUsers response:', res.data)
+    return res.data
+  } catch (e) {
+    console.error('getAllUsers error:', e?.response?.data || e)
+    throw e
+  }
 }
 
 export async function changeUserInfos(payload) {
@@ -71,8 +83,25 @@ export async function deleteCategorie(idCat) {
   return (await API.delete(`categories/${idCat}`)).data
 }
 
-export async function updateCategories(idCat, payload) {
+export async function updateCategories(idCat, payd) {
   return (await API.put(`categories/${idCat}`, payload)).data
+}
+
+// ========== SUBCATEGORIES ==========
+export async function createSubcategory(categoryId, payload) {
+  return (await API.post(`categories/${categoryId}/subcategories`, payload)).data
+}
+
+export async function getSubcategories(categoryId) {
+  return (await API.get(`categories/${categoryId}/subcategories`)).data
+}
+
+export async function updateSubcategory(categoryId, subcategoryId, payload) {
+  return (await API.put(`categories/${categoryId}/subcategories/${subcategoryId}`, payload)).data
+}
+
+export async function deleteSubcategory(categoryId, subcategoryId) {
+  return (await API.delete(`categories/${categoryId}/subcategories/${subcategoryId}`)).data
 }
 
 // ========== PRODUCTS ==========
@@ -200,4 +229,13 @@ export async function getClientOrders(clientId) {
 
 export async function cancelOrder(orderID) {
   return (await API.delete(`orders/${orderID}`)).data
+} 
+
+// ========== AUTH TOKEN ==========
+export async function renewToken() {
+  return (await API.post('renew-token')).data
+}
+
+export async function verifyToken() {
+  return (await API.get('verify-token')).data
 } 

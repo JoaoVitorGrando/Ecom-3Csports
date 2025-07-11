@@ -24,7 +24,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login } from '@/services/HttpService'
 import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
 
@@ -36,12 +35,7 @@ const auth = useAuthStore()
 
 async function handleLogin() {
   try {
-    const data = await login({ email: email.value, password: senha.value })
-    auth.token = data.token
-    auth.user = data.user
-    auth.role = data.user.role
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('role', data.user.role)
+    await auth.login(email.value, senha.value)
     showToast('Login realizado com sucesso!', 'success')
     router.push('/')
   } catch (e) {

@@ -1,5 +1,13 @@
 <template>
   <div class="home container-fluid py-5">
+    <!-- Nome do site estilizado -->
+    <div class="row justify-content-center mb-3">
+      <div class="col-12 text-center">
+        <h1 class="fw-bold display-3" style="letter-spacing:1px;">
+          <span style="color:#18181b;">3C</span> <span style="color:#FFD600;">sports</span>
+        </h1>
+      </div>
+    </div>
     <!-- Remover botão flutuante do carrinho e CartDrawer -->
     <div class="row justify-content-center mb-5">
       <div class="col-12 col-lg-10">

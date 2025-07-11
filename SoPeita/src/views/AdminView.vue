@@ -2,8 +2,9 @@
   <div class="admin-layout">
     <!-- Sidebar -->
     <aside class="admin-sidebar d-flex flex-column align-items-center py-4 px-2">
-      <div class="sidebar-logo mb-4">
-        <i class="bi bi-shop-window fs-2 text-success"></i>
+      <!-- Remover logo/texto acima do Olá -->
+      <div class="admin-ola mb-3 w-100 text-center ola-minimalista">
+        Olá, {{ adminName }}
       </div>
       <nav class="nav flex-column w-100 gap-2">
         <button class="nav-link sidebar-btn" :class="{active: tab==='dashboard'}" @click="tab='dashboard'">
@@ -12,81 +13,92 @@
         <button class="nav-link sidebar-btn" :class="{active: tab==='produtos'}" @click="tab='produtos'">
           <i class="bi bi-box-seam me-2"></i> Produtos
         </button>
-        <button class="nav-link sidebar-btn" :class="{active: tab==='usuarios'}" @click="tab='usuarios'">
-          <i class="bi bi-people me-2"></i> Usuários
-        </button>
-        <button class="nav-link sidebar-btn" :class="{active: tab==='pedidos'}" @click="tab='pedidos'">
+        <button v-if="userRole==='ADMIN' || userRole==='MODERATOR'" class="nav-link sidebar-btn" :class="{active: tab==='pedidos'}" @click="tab='pedidos'">
           <i class="bi bi-bag-check me-2"></i> Pedidos
         </button>
-        <button class="nav-link sidebar-btn" :class="{active: tab==='cupons'}" @click="tab='cupons'">
+        <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='usuarios'}" @click="tab='usuarios'">
+          <i class="bi bi-people me-2"></i> Usuários
+        </button>
+        <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='cupons'}" @click="tab='cupons'">
           <i class="bi bi-ticket-perforated me-2"></i> Cupons
         </button>
-        <button class="nav-link sidebar-btn" :class="{active: tab==='categorias'}" @click="tab='categorias'">
+        <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='categorias'}" @click="tab='categorias'">
           <i class="bi bi-tags me-2"></i> Categorias
         </button>
       </nav>
     </aside>
     <!-- Main -->
     <main class="admin-main">
-      <header class="admin-header d-flex align-items-center justify-content-between px-4 py-3 mb-4">
-        <div>
-          <h2 class="fw-bold mb-1">Bem-vindo, {{ adminName }}!</h2>
-          <span class="badge bg-success">Administrador</span>
-        </div>
-        <i class="bi bi-person-circle fs-2 text-secondary"></i>
-      </header>
-      <hr class="divider-h mb-4">
-      <!-- Dashboard -->
+      <header class="admin-header text-center p-0 m-0" style="box-shadow:none;background:none;border:none;"></header>
       <section v-if="tab==='dashboard'">
-        <div class="row g-4 mb-4">
+        <div class="dashboard-header text-center mt-0 mb-3">
+          <h2 class="dashboard-title dashboard-title-custom mb-1">Dashboard</h2>
+          <p class="dashboard-desc mb-0">Visão geral do seu e-commerce</p>
+        </div>
+        <div class="dashboard-top row g-4 align-items-stretch justify-content-center">
           <div class="col-12 col-md-6 col-lg-3">
-            <div class="card dashboard-card">
-              <div class="card-body text-center">
-                <i class="bi bi-box-seam fs-2 text-success mb-2"></i>
-                <h5 class="fw-bold">Produtos</h5>
-                <div class="display-6 fw-bold">{{ produtos.length }}</div>
+            <div class="kpi-block-minimal text-center p-4 mb-2">
+              <i class="bi bi-box-seam kpi-icon mb-2" style="color:#18181b !important;"></i>
+              <div class="kpi-value mb-1">{{ produtos.length }}</div>
+                <div class="kpi-label">Produtos</div>
+              </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-block-minimal text-center p-4 mb-2">
+              <i class="bi bi-people kpi-icon mb-2" style="color:#18181b !important;"></i>
+              <div class="kpi-value mb-1">{{ usuarios.length }}</div>
+                <div class="kpi-label">Usuários</div>
+              </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-block-minimal text-center p-4 mb-2">
+              <i class="bi bi-bag-check kpi-icon mb-2" style="color:#18181b !important;"></i>
+              <div class="kpi-value mb-1">{{ pedidos.length }}</div>
+                <div class="kpi-label">Pedidos</div>
+              </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="kpi-block-minimal text-center p-4 mb-2">
+              <i class="bi bi-cash-coin kpi-icon mb-2" style="color:#18181b !important;"></i>
+              <div class="kpi-value mb-1">R$ {{ totalVendas.toFixed(2) }}</div>
+                <div class="kpi-label">Vendas</div>
               </div>
             </div>
           </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card dashboard-card">
-              <div class="card-body text-center">
-                <i class="bi bi-people fs-2 text-primary mb-2"></i>
-                <h5 class="fw-bold">Usuários</h5>
-                <div class="display-6 fw-bold">{{ usuarios.length }}</div>
-              </div>
+        <div class="row mt-4 justify-content-center">
+          <div class="col-12 col-md-8 col-lg-6">
+            <div class="dashboard-summary-minimal p-4 text-center">
+              <div class="summary-title mb-2">Resumo rápido</div>
+              <ul class="summary-list list-unstyled mb-0">
+                <li v-if="produtos.filter(p => p.stock < 5).length > 0" class="mb-1">
+                  <i class="bi bi-exclamation-triangle-fill me-1 text-warning"></i>
+                  {{ produtos.filter(p => p.stock < 5).length }} produto(s) com estoque baixo
+                </li>
+                <li v-else class="mb-1">
+                  <i class="bi bi-check-circle-fill me-1 text-success"></i>
+                  Todos os produtos com estoque adequado
+                </li>
+                <li v-if="pedidos.filter(p => p.status !== 'ENTREGUE').length > 0" class="mb-1">
+                  <i class="bi bi-clock-history me-1 text-primary"></i>
+                  {{ pedidos.filter(p => p.status !== 'ENTREGUE').length }} pedido(s) pendente(s)
+                </li>
+                <li v-else class="mb-1">
+                  <i class="bi bi-check-circle-fill me-1 text-success"></i>
+                  Nenhum pedido pendente
+                </li>
+              </ul>
             </div>
           </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card dashboard-card">
-              <div class="card-body text-center">
-                <i class="bi bi-bag-check fs-2 text-warning mb-2"></i>
-                <h5 class="fw-bold">Pedidos</h5>
-                <div class="display-6 fw-bold">{{ pedidos.length }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card dashboard-card">
-              <div class="card-body text-center">
-                <i class="bi bi-cash-coin fs-2 text-info mb-2"></i>
-                <h5 class="fw-bold">Vendas</h5>
-                <div class="display-6 fw-bold">R$ {{ totalVendas.toFixed(2) }}</div>
-              </div>
-            </div>
-          </div>
-    </div>
-        <hr class="divider-h my-4">
-        <div class="text-center text-muted">Selecione uma função no menu lateral para gerenciar o marketplace.</div>
+        </div>
       </section>
       <!-- Produtos -->
       <section v-else-if="tab==='produtos'">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold mb-0">Produtos</h4>
-            <button class="btn btn-success btn-sm fw-bold" @click="openProdutoModal()">
-              <i class="bi bi-plus-circle me-1"></i> Novo Produto
-            </button>
-          </div>
+        <div class="text-center mt-0 mb-1 position-relative">
+          <h4 class="fw-bold mb-0 dashboard-title-custom">Produtos</h4>
+          <button class="btn btn-success btn-sm fw-bold position-absolute end-0 top-50 translate-middle-y me-2" style="right:0;" @click="openProdutoModal()">
+            <i class="bi bi-plus-circle me-1"></i> Novo Produto
+          </button>
+        </div>
         <div class="card border-0 shadow-sm rounded-4 p-0 mb-4" style="background:#fff;">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -138,43 +150,43 @@
         <!-- Modal Produto -->
         <div v-if="showProdutoModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
           <div class="modal-dialog modal-dialog-centered w-100" style="max-width:520px;">
-            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 1.5rem; max-height:90vh; overflow-y:auto;">
-              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:1.2rem; padding-bottom:0.7rem; padding-left:0; padding-right:0;">
+            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem; max-height:90vh; overflow-y:auto;">
+              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
                 <h5 class="modal-title fw-semibold text-secondary-emphasis">{{ produtoEditando.id ? 'Editar Produto' : 'Novo Produto' }}</h5>
                 <button type="button" class="btn-close" @click="closeProdutoModal"></button>
               </div>
               <form @submit.prevent="salvarProduto">
-                <div class="modal-body py-3 px-0" style="padding-left:0; padding-right:0;">
+                <div class="modal-body py-4 px-0" style="padding-left:0; padding-right:0;">
                   <div v-if="produtoError" class="alert alert-danger py-2 small mb-3">{{ produtoError }}</div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Nome</label>
                     <input v-model="produtoEditando.name" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome do produto" />
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Descrição</label>
                     <textarea v-model="produtoEditando.description" class="form-control bg-light border-0 rounded-3 form-control-lg" rows="2" required placeholder="Descrição do produto"></textarea>
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Preço</label>
                     <input v-model.number="produtoEditando.price" type="number" min="0" step="0.01" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="0,00" />
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Estoque</label>
                     <input v-model.number="produtoEditando.stock" type="number" min="0" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="0" />
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Categoria</label>
                     <select v-model="produtoEditando.category_id" class="form-select bg-light border-0 rounded-3 form-control-lg" required>
                       <option value="" disabled>Selecione...</option>
                       <option v-for="cat in categorias" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                     </select>
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Imagem</label>
                     <input type="file" accept="image/*" class="form-control bg-light border-0 rounded-3 form-control-lg" @change="handleImageChange" :required="!produtoEditando.id" />
                   </div>
                 </div>
-                <div class="modal-footer border-0 pb-3 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
+                <div class="modal-footer border-0 pb-4 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
                   <button type="button" class="btn btn-light border px-4 py-2 rounded-3" @click="closeProdutoModal">Cancelar</button>
                   <button type="submit" class="btn btn-success px-4 py-2 rounded-3 fw-bold" :disabled="produtoLoading" style="background:#4ade80;border:none;">
                     <span v-if="produtoLoading" class="spinner-border spinner-border-sm me-2"></span>
@@ -186,67 +198,81 @@
           </div>
         </div>
       </section>
-      <!-- Usuários -->
-      <section v-else-if="tab==='usuarios'">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold mb-0">Usuários</h4>
-            <button class="btn btn-success btn-sm fw-bold" @click="openUsuarioModal()">
-              <i class="bi bi-person-plus me-1"></i> Novo Usuário
+      <!-- Usuário logado (ADMIN) -->
+      <section v-else-if="tab==='usuarios' && userRole==='ADMIN'">
+        <div class="text-center mt-0 mb-1 position-relative">
+          <h4 class="fw-bold mb-0 dashboard-title-custom text-preto">Perfil do Administrador</h4>
+          <button class="btn btn-primary btn-sm fw-bold position-absolute end-0 top-50 translate-middle-y me-2" style="right:0;" @click="openUserModal()">
+            <i class="bi bi-person-plus me-1 icon-amarelo"></i> Criar Moderador
             </button>
           </div>
-        <div class="table-responsive mb-4">
-            <table class="table table-hover align-middle">
-              <thead class="table-success">
-                <tr>
-                  <th>Nome</th>
-                  <th>Email</th>
-                  <th>Perfil</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="usuario in usuarios" :key="usuario.id">
-                <td>{{ usuario.name }}</td>
-                <td>{{ usuario.email }}</td>
-                <td><span class="badge" :class="usuario.role === 'ADMIN' ? 'bg-success' : usuario.role === 'MODERATOR' ? 'bg-primary' : 'bg-secondary'">{{ usuario.role }}</span></td>
-                <td><span class="badge" :class="usuario.active ? 'bg-success' : 'bg-danger'">{{ usuario.active ? 'Ativo' : 'Bloqueado' }}</span></td>
-                <td>
-                  <button class="btn btn-outline-primary btn-sm me-2" @click="openUsuarioModal(usuario)" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                  <button class="btn btn-outline-warning btn-sm me-2" @click="toggleUserRole(usuario)" title="Promover/Demover"><i class="bi bi-arrow-repeat"></i></button>
-                  <button class="btn btn-outline-danger btn-sm" @click="toggleUserStatus(usuario)" title="Bloquear/Desbloquear"><i class="bi bi-lock"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="card border-0 shadow-sm rounded-4 p-0 mb-4" style="background:#fff;max-width:480px;margin:auto;">
+          <div class="d-flex align-items-center mb-3">
+            <img :src="userLogado.image_path ? getImage(userLogado.image_path) : '/default-user.png'" alt="avatar" class="rounded-circle me-3" style="width:72px;height:72px;object-fit:cover;background:#f5f5f5;">
+            <div>
+              <div class="fw-bold fs-5">{{ userLogado.name }}</div>
+              <div class="text-muted small">{{ userLogado.email }}</div>
+              <span class="badge bg-success mt-1">{{ userLogado.role }}</span>
         </div>
-        <!-- Modal Usuário -->
-        <div v-if="showUsuarioModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
-          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:440px;">
-            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem;">
-              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
-                <h5 class="modal-title fw-semibold text-secondary-emphasis">{{ usuarioEditando.id ? 'Editar Usuário' : 'Novo Usuário' }}</h5>
-                <button type="button" class="btn-close" @click="closeUsuarioModal"></button>
               </div>
-              <form @submit.prevent="salvarUsuario">
-                <div class="modal-body py-4 px-0" style="padding-left:0; padding-right:0;">
-                  <!-- Campos do usuário -->
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" @click="openEditModal()"><i class="bi bi-pencil me-1"></i> Editar Perfil</button>
+            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" @click="confirmDeleteUser()"><i class="bi bi-trash me-1"></i> Excluir Conta</button>
+          </div>
+        </div>
+        <!-- Modal Criar Moderador -->
+        <div v-if="showUserModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
+          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:440px;">
+            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem; max-height:90vh; overflow-y:auto;">
+              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
+                <h5 class="modal-title fw-semibold text-secondary-emphasis">Novo Moderador</h5>
+                <button type="button" class="btn-close" @click="closeUserModal"></button>
+              </div>
+              <form @submit.prevent="salvarUser">
+                <div class="modal-body py-4 px-0">
+                  <div v-if="userError" class="alert alert-danger py-2 small mb-3">{{ userError }}</div>
                   <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Nome</label>
-                    <input v-model="usuarioEditando.nome" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome do usuário" />
+                    <input v-model="userEditando.name" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome do moderador" />
                   </div>
                   <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">E-mail</label>
-                    <input v-model="usuarioEditando.email" type="email" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="email@exemplo.com" />
+                    <label class="form-label mb-1 text-secondary">Email</label>
+                    <input v-model="userEditando.email" type="email" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Email" />
                   </div>
-                  <!-- Adicione outros campos conforme necessário -->
+                  <div class="mb-4">
+                    <label class="form-label mb-1 text-secondary">Senha</label>
+                    <input v-model="userEditando.password" type="password" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Senha" />
+                  </div>
+                  <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary rounded-pill px-4" type="submit">Criar Moderador</button>
+                  </div>
                 </div>
-                <div class="modal-footer border-0 pb-4 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
-                  <button type="button" class="btn btn-light border px-4 py-2 rounded-3" @click="closeUsuarioModal">Cancelar</button>
-                  <button type="submit" class="btn btn-success px-4 py-2 rounded-3 fw-bold" :disabled="usuarioLoading" style="background:#4ade80;border:none;">
-                    <span v-if="usuarioLoading" class="spinner-border spinner-border-sm me-2"></span>
-                    Salvar
-                  </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- Modal Editar Perfil -->
+        <div v-if="showEditModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
+          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:440px;">
+            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem; max-height:90vh; overflow-y:auto;">
+              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
+                <h5 class="modal-title fw-semibold text-secondary-emphasis">Editar Perfil</h5>
+                <button type="button" class="btn-close" @click="closeEditModal"></button>
+              </div>
+              <form @submit.prevent="salvarEdicaoPerfil">
+                <div class="modal-body py-4 px-0">
+                  <div v-if="editError" class="alert alert-danger py-2 small mb-3">{{ editError }}</div>
+                  <div class="mb-4">
+                    <label class="form-label mb-1 text-secondary">Nome</label>
+                    <input v-model="userLogadoEdit.name" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome" />
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label mb-1 text-secondary">Email</label>
+                    <input v-model="userLogadoEdit.email" type="email" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Email" />
+                  </div>
+                  <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary rounded-pill px-4" type="submit">Salvar</button>
+                  </div>
                 </div>
               </form>
             </div>
@@ -255,42 +281,44 @@
       </section>
       <!-- Pedidos -->
       <section v-else-if="tab==='pedidos'">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="fw-bold mb-0">Pedidos</h4>
+        <div class="text-center mt-0 mb-1 position-relative">
+          <h4 class="fw-bold mb-0 dashboard-title-custom">Pedidos</h4>
         </div>
-        <div class="table-responsive mb-4">
-          <table class="table table-hover align-middle">
-            <thead class="table-success">
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Status</th>
-                <th>Valor</th>
-                <th>Data</th>
+        <div class="card border-0 shadow-sm rounded-4 p-0 mb-4" style="background:#fff;">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-success">
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Valor</th>
+                  <th>Data</th>
                   <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="pedido in pedidos" :key="pedido.id">
-                <td>{{ pedido.id }}</td>
-                <td>{{ pedido.cliente }}</td>
-                <td><span class="badge" :class="pedido.status === 'ENTREGUE' ? 'bg-success' : 'bg-warning'">{{ pedido.status }}</span></td>
-                <td>R$ {{ Number(pedido.valor).toFixed(2) }}</td>
-                <td>{{ pedido.data }}</td>
-                <td>
-                  <button class="btn btn-outline-primary btn-sm" @click="verPedido(pedido)"><i class="bi bi-eye"></i></button>
-                  <button class="btn btn-outline-success btn-sm" @click="alterarStatusPedido(pedido)"><i class="bi bi-arrow-repeat"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="pedido in pedidos" :key="pedido.id">
+                  <td>{{ pedido.id }}</td>
+                  <td>{{ pedido.cliente }}</td>
+                  <td><span class="badge" :class="pedido.status === 'ENTREGUE' ? 'bg-success' : 'bg-warning'">{{ pedido.status }}</span></td>
+                  <td>R$ {{ Number(pedido.valor).toFixed(2) }}</td>
+                  <td>{{ pedido.data }}</td>
+                  <td>
+                    <button class="btn btn-outline-primary btn-sm" @click="verPedido(pedido)"><i class="bi bi-eye"></i></button>
+                    <button class="btn btn-outline-success btn-sm" @click="alterarStatusPedido(pedido)"><i class="bi bi-arrow-repeat"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
       <!-- Cupons -->
       <section v-else-if="tab==='cupons'">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="fw-bold mb-0">Cupons</h4>
-          <button class="btn btn-success btn-sm fw-bold" @click="openCupomModal()">
+        <div class="text-center mt-0 mb-1 position-relative">
+          <h4 class="fw-bold mb-0 dashboard-title-custom">Cupons</h4>
+          <button class="btn btn-success btn-sm fw-bold position-absolute end-0 top-50 translate-middle-y me-2" style="right:0;" @click="openCupomModal()">
             <i class="bi bi-plus-circle me-1"></i> Novo Cupom
           </button>
         </div>
@@ -318,7 +346,7 @@
                 </tr>
                 <tr v-else v-for="cupom in cupons" :key="cupom.id">
                   <td class="ps-4 fw-semibold">{{ cupom.code }}</td>
-                  <td><span class="badge bg-success bg-opacity-10 text-success fs-6">{{ Number(cupom.discount_percentage).toFixed(0) }}%</span></td>
+                  <td><span class="badge fs-6 text-dark">{{ Number(cupom.discount_percentage).toFixed(0) }}%</span></td>
                   <td>{{ formatDate(cupom.start_date) }}</td>
                   <td>{{ formatDate(cupom.end_date) }}</td>
                   <td class="text-end pe-4">
@@ -383,20 +411,20 @@
       </section>
       <!-- Categorias -->
       <section v-else-if="tab==='categorias'">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="fw-bold mb-0">Categorias</h4>
-          <button class="btn btn-success btn-sm fw-bold" @click="openCategoriaModal()">
+        <div class="text-center mt-0 mb-1 position-relative">
+          <h4 class="fw-bold mb-0 dashboard-title-custom">Categorias</h4>
+          <button class="btn btn-success btn-sm fw-bold position-absolute end-0 top-50 translate-middle-y me-2" style="right:0;" @click="openCategoriaModal()">
             <i class="bi bi-plus-circle me-1"></i> Nova Categoria
           </button>
-          </div>
+        </div>
         <div class="card border-0 shadow-sm rounded-4 p-0 mb-4" style="background:#fff;">
           <div class="table-responsive">
             <table class="table align-middle mb-0">
               <thead class="table-success">
                 <tr>
                   <th class="ps-4">Nome</th>
-                  <th class="d-none d-md-table-cell">Descrição</th>
-                  <th class="d-none d-md-table-cell">Imagem</th>
+                  <th>Descrição</th>
+                  <th>Imagem</th>
                   <th class="text-end pe-4">Ações</th>
                 </tr>
               </thead>
@@ -405,17 +433,21 @@
                   <td colspan="4" class="text-center text-muted py-4">Nenhuma categoria cadastrada ainda.</td>
                 </tr>
                 <tr v-else v-for="categoria in categorias" :key="categoria.id">
-                  <td class="ps-4 fw-semibold">{{ categoria.name }}</td>
-                  <td class="d-none d-md-table-cell">{{ categoria.description || '-' }}</td>
-                  <td class="d-none d-md-table-cell">
-                    <img :src="getImage(categoria.image_path)" alt="img" style="width:40px;height:40px;object-fit:cover;border-radius:8px;background:#f5f5f5;">
+                  <td class="ps-4 fw-semibold align-middle">{{ categoria.name }}</td>
+                  <td class="align-middle">{{ categoria.description || '-' }}</td>
+                  <td class="align-middle">
+                    <img :src="getImage(categoria.image_path)" alt="img" style="width:48px;height:48px;object-fit:cover;border-radius:12px;background:#f5f5f5;">
                   </td>
-                  <td class="text-end pe-4">
-                    <button class="btn btn-outline-primary btn-sm me-2" @click="openCategoriaModal(categoria)" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-outline-danger btn-sm" :disabled="deletingCategoryId === categoria.id" @click="removerCategoria(categoria)">
-                      <span v-if="deletingCategoryId === categoria.id" class="spinner-border spinner-border-sm me-1"></span>
-                      <i class="bi bi-trash"></i>
-                    </button>
+                  <td class="text-end pe-4 align-middle">
+                    <div class="d-flex justify-content-end align-items-center gap-2">
+                      <button class="btn btn-outline-primary btn-sm" @click="openCategoriaModal(categoria)" title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm" :disabled="deletingCategoryId === categoria.id" @click="removerCategoria(categoria)">
+                        <span v-if="deletingCategoryId === categoria.id" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -424,28 +456,28 @@
         </div>
         <!-- Modal Categoria -->
         <div v-if="showCategoriaModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
-          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:420px;">
-            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 1.5rem; max-height:90vh; overflow-y:auto;">
-              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:1.2rem; padding-bottom:0.7rem; padding-left:0; padding-right:0;">
+          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:440px;">
+            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem;">
+              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
                 <h5 class="modal-title fw-semibold text-secondary-emphasis">{{ categoriaEditando.id ? 'Editar Categoria' : 'Nova Categoria' }}</h5>
                 <button type="button" class="btn-close" @click="closeCategoriaModal"></button>
               </div>
               <form @submit.prevent="salvarCategoria">
-                <div class="modal-body py-3 px-0" style="padding-left:0; padding-right:0;">
-                  <div class="mb-3">
+                <div class="modal-body py-4 px-0" style="padding-left:0; padding-right:0;">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Nome</label>
                     <input v-model="categoriaEditando.name" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome da categoria" />
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Descrição</label>
                     <textarea v-model="categoriaEditando.description" class="form-control bg-light border-0 rounded-3 form-control-lg" rows="2" placeholder="Descrição da categoria"></textarea>
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-4">
                     <label class="form-label mb-1 text-secondary">Imagem</label>
                     <input type="file" accept="image/*" class="form-control bg-light border-0 rounded-3 form-control-lg" @change="handleCategoriaImageChange" />
                   </div>
                 </div>
-                <div class="modal-footer border-0 pb-3 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
+                <div class="modal-footer border-0 pb-4 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
                   <button type="button" class="btn btn-light border px-4 py-2 rounded-3" @click="closeCategoriaModal">Cancelar</button>
                   <button type="submit" class="btn btn-success px-4 py-2 rounded-3 fw-bold" :disabled="categoriaLoading" style="background:#4ade80;border:none;">
                     <span v-if="categoriaLoading" class="spinner-border spinner-border-sm me-2"></span>
@@ -470,6 +502,57 @@ import { useCouponsStore } from '@/stores/coupons'
 import { useAddressesStore } from '@/stores/addresses'
 import { getCategories, registerCategories, updateCategories, deleteCategorie } from '@/services/HttpService'
 import { showToast } from '@/utils/toast'
+import { getAllUsers, register, registerModerator, changeUserInfos, deleteUser, getUser } from '@/services/HttpService'
+const usuarios = ref([])
+const usuariosLoading = ref(false)
+const usuariosError = ref('')
+const showUserModal = ref(false)
+const userEditando = ref({})
+const userError = ref('')
+
+async function fetchUsuarios() {
+  usuariosLoading.value = true
+  try {
+    // Chamada real para buscar todos os usuários
+    const usersResponse = await getAllUsers() // GET /users/
+    usuarios.value = Array.isArray(usersResponse) ? usersResponse : (usersResponse.results || [])
+    usuariosError.value = ''
+  } catch (e) {
+    usuariosError.value = e?.response?.data?.detail || e?.message || 'Erro ao carregar usuários.'
+  } finally {
+    usuariosLoading.value = false
+  }
+}
+function openUserModal(usuario = null) {
+  userEditando.value = usuario ? { ...usuario } : { name: '', email: '', password: '', role: 'CLIENT' }
+  showUserModal.value = true
+  userError.value = ''
+}
+function closeUserModal() {
+  showUserModal.value = false
+  userEditando.value = {}
+}
+async function salvarUser() {
+  try {
+    if (userEditando.value.id) {
+      // Atualizar usuário existente
+      await changeUserInfos(userEditando.value)
+    } else {
+      // Criar novo usuário/moderador
+      if (userEditando.value.role === 'MODERATOR') {
+        await registerModerator(userEditando.value)
+      } else {
+        await register(userEditando.value)
+      }
+    }
+    await fetchUsuarios()
+    closeUserModal()
+  } catch (e) {
+    userError.value = 'Erro ao salvar usuário.'
+  }
+}
+
+onMounted(fetchUsuarios)
 
 const tab = ref('dashboard')
 const productsStore = useProductsStore()
@@ -481,12 +564,14 @@ const addressesStore = useAddressesStore()
 const produtos = computed(() => productsStore.products)
 const produtosLoading = computed(() => productsStore.loading)
 const produtosError = computed(() => productsStore.error)
-const usuarios = ref([{ id: 1, name: 'Admin', email: 'admin@sopeita.com', role: 'ADMIN', active: true }]) // Substitua por store real se houver
+
 const pedidos = computed(() => ordersStore.orders)
 const cupons = computed(() => couponsStore.coupons)
 const categorias = ref([])
 const totalVendas = computed(() => pedidos.value.reduce((acc, p) => acc + (p.valor || 0), 0))
 const adminName = computed(() => authStore.user?.name || authStore.user?.email || 'Administrador')
+const auth = useAuthStore()
+const userRole = auth.role
 
   // Carregar categorias da API
 async function fetchCategorias() {
@@ -688,72 +773,486 @@ function handleCategoriaImageChange(e) {
   const file = e.target.files[0]
   if (file) categoriaEditando.value.image = file
 }
+
+const userLogado = ref({})
+const userLogadoEdit = ref({})
+const showEditModal = ref(false)
+const editError = ref('')
+
+async function fetchUserLogado() {
+  try {
+    userLogado.value = await getUser()
+    userLogadoEdit.value = { ...userLogado.value }
+  } catch (e) {
+    userLogado.value = {}
+  }
+}
+function openEditModal() {
+  userLogadoEdit.value = { ...userLogado.value }
+  showEditModal.value = true
+  editError.value = ''
+}
+function closeEditModal() {
+  showEditModal.value = false
+  userLogadoEdit.value = {}
+}
+async function salvarEdicaoPerfil() {
+  try {
+    await changeUserInfos(userLogadoEdit.value)
+    await fetchUserLogado()
+    closeEditModal()
+  } catch (e) {
+    editError.value = e?.response?.data?.detail || e?.message || 'Erro ao editar perfil.'
+  }
+}
+async function confirmDeleteUser() {
+  if (confirm('Tem certeza que deseja excluir sua conta?')) {
+    try {
+      await deleteUser()
+      window.location.href = '/login'
+    } catch (e) {
+      editError.value = 'Erro ao excluir conta.'
+    }
+  }
+}
+onMounted(fetchUserLogado)
 </script> 
 
 <style scoped>
+:root {
+  --admin-sidebar-bg: #f8f9fa; /* cor mais clara e neutra */
+  --admin-sidebar-active: #e2e8f0;
+  --admin-sidebar-text: #222;
+  --admin-main-bg: #f4f6f8;
+  --admin-card-bg: #fff;
+  --admin-card-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  --admin-header-bg: #fff;
+  --admin-header-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
 .admin-layout {
   display: flex;
   min-height: 100vh;
-  background: #f7f9fa;
+  background: var(--admin-main-bg);
 }
 .admin-sidebar {
   width: 220px;
-  background: #212529;
-  color: #fff;
+  background: var(--admin-sidebar-bg);
+  color: var(--admin-sidebar-text);
   min-height: 100vh;
-  border-right: 2px solid #e9ecef;
+  border-right: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   left: 0;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: none;
 }
-.sidebar-logo {
-  font-size: 2.2rem;
-  color: #21ba45;
+.sidebar-logo-text {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: #2563eb;
+  letter-spacing: 0.03em;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  user-select: none;
+}
+.admin-ola {
+  color: #4f46e5;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background-clip: padding-box;
+}
+.ola-minimalista {
+  font-size: 0.98rem;
+  color: #888;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.2rem 0 0.2rem 0;
+  margin-bottom: 1.2rem;
+}
+.nav {
+  width: 100%;
 }
 .sidebar-btn {
-  color: #fff;
+  color: var(--admin-sidebar-text);
   background: none;
   border: none;
   text-align: left;
-  font-size: 1.1rem;
-  padding: 0.7rem 1.2rem;
-  border-radius: 0.7rem;
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
   transition: background 0.2s, color 0.2s;
   width: 100%;
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  font-weight: 500;
+  margin-bottom: 2px;
 }
 .sidebar-btn.active, .sidebar-btn:hover {
-  background: #21ba45;
-  color: #fff;
+  background: var(--admin-sidebar-active);
+  color: #222;
+  font-weight: 600;
 }
 .admin-main {
   flex: 1;
-  padding: 0 0 0 0;
+  padding: 2.2rem 2.2rem 2.2rem 2.2rem;
   min-height: 100vh;
+  background: var(--admin-main-bg);
+  box-sizing: border-box;
 }
 .admin-header {
-  background: #fff;
-  border-radius: 0 0 1.2rem 1.2rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  border-bottom: 2px solid #e9ecef;
+  background: var(--admin-header-bg);
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: var(--admin-header-shadow);
+  border-bottom: none;
+  margin-bottom: 0.5rem;
 }
 .divider-h {
   border: none;
-  border-top: 2px solid #e9ecef;
+  border-top: 1px solid #e2e8f0;
+  margin: 0 0 1.5rem 0;
+}
+.dashboard-minimal {
+  padding: 2rem;
+  background: var(--admin-card-bg);
+  border-radius: 1rem;
+  box-shadow: var(--admin-card-shadow);
+  border: none;
+  text-align: center;
+}
+.dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+.kpi-block {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #222;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: none;
+}
+.kpi-block i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #6366f1;
+}
+.kpi-value {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.kpi-label {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+.dashboard-summary {
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 1.2rem;
+  color: #222;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.summary-title {
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+.summary-list {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
+.summary-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.summary-list li i {
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  color: #6366f1;
+}
 .dashboard-card {
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-radius: 1rem;
+  box-shadow: var(--admin-card-shadow);
   border: none;
-  background: #fff;
-  transition: box-shadow 0.2s, transform 0.2s;
+  background: var(--admin-card-bg);
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dashboard-card .card-body {
+  padding: 1rem 0.5rem 1rem 0.5rem;
+}
+.dashboard-card h5 {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+.dashboard-card .display-6 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #6366f1;
+  margin-top: 0.2rem;
+}
+.dashboard-card i {
+  margin-bottom: 0.2rem;
+  font-size: 1.7rem;
+  color: #6366f1;
 }
 .dashboard-card:hover {
-  box-shadow: 0 4px 24px rgba(33,186,69,0.13);
-  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  transform: translateY(-2px) scale(1.02);
+}
+.admin-main h4, .admin-main h5, .admin-main h2 {
+  color: #222;
+  font-weight: 700;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+}
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--admin-card-bg);
+  box-shadow: var(--admin-card-shadow);
+}
+.table th {
+  background: #f1f5f9;
+  color: #222;
+  font-weight: 700;
+  border: none;
+}
+.table td {
+  border-top: 1px solid #e2e8f0;
+  background: var(--admin-card-bg);
+}
+.table tr {
+  transition: background 0.2s;
+}
+.table tr:hover {
+  background: #f3f4f6;
+}
+.btn-outline-primary, .btn-outline-danger, .btn-outline-warning {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.98rem;
+  transition: all 0.2s;
+}
+.btn-outline-primary:hover {
+  background: #6366f1;
+  color: #fff;
+}
+.btn-outline-danger:hover {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-outline-warning:hover {
+  background: #f59e42;
+  color: #fff;
+}
+.modal-content {
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+}
+.kpi-icon {
+  color: #6366f1 !important;
+  font-size: 2.2rem !important;
+  margin-bottom: 0.5rem;
+}
+.dashboard-header {
+  min-height: 32px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0;
+  text-align: center;
+}
+.dashboard-top {
+  margin-bottom: 2rem;
+}
+@media (max-width: 991px) {
+  .dashboard-top {
+    flex-direction: column;
+  }
+  .dashboard-kpis {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  .dashboard-summary {
+    margin-top: 1.5rem;
+  }
+}
+@media (max-width: 991px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+  .admin-sidebar {
+    width: 100vw;
+    min-height: unset;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: none;
+    position: static;
+    padding: 0.7rem 0.5rem;
+    z-index: 20;
+  }
+  .sidebar-logo, .admin-ola {
+    display: none;
+  }
+  .nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100vw;
+  }
+  .sidebar-btn {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 6px;
+    margin-bottom: 0;
+  }
+  .admin-main {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+  }
+}
+@media (max-width: 700px) {
+  .admin-main {
+    padding: 0;
+  }
+  .dashboard-card {
+    min-height: 100px;
+  }
+  .table th, .table td {
+    font-size: 0.93rem;
+    padding: 0.4rem 0.4rem;
+  }
+}
+.dashboard-title-custom {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 2.4rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.2rem;
+  color: #18181b;
+  line-height: 1.08;
+  text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(0,0,0,0.03);
+}
+.dashboard-desc {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-size: 1.08rem;
+  color: #52525b;
+  margin-bottom: 0.7rem;
+  margin-top: 0.1rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 700px) {
+  .dashboard-title-custom {
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+  .dashboard-desc {
+    font-size: 0.97rem;
+    margin-bottom: 0.5rem;
+  }
+}
+.categoria-icon {
+  color: #6366f1 !important;
+  font-size: 1.25rem !important;
+  vertical-align: middle;
+  display: inline-block;
+}
+.categoria-btn-icon {
+  padding: 0.25rem 0.5rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.categoria-btn-add {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+.categoria-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f5f5f5;
+  display: block;
+  margin: 0 auto;
+}
+.kpi-block-minimal {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px rgba(33,186,69,0.04);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.18s;
+}
+.kpi-block-minimal:hover {
+  box-shadow: 0 4px 24px rgba(33,186,69,0.10);
+}
+.kpi-icon {
+  font-size: 2.1rem;
+  color: #1976d2;
+  opacity: 0.85;
+}
+.kpi-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #222;
+}
+.kpi-label {
+  font-size: 1.05rem;
+  color: #888;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.dashboard-summary-minimal {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px rgba(33,186,69,0.04);
+  font-size: 1.08rem;
+}
+.summary-title {
+  font-size: 1.13rem;
+  font-weight: 600;
+  color: #1976d2;
+  margin-bottom: 0.5rem;
 }
 </style> 

@@ -35,10 +35,10 @@ function getImage(path) {
 
 <style scoped>
 .product-card {
-  background: var(--color-card-bg, #fff);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-  border-radius: 1.2rem;
-  transition: transform 0.18s cubic-bezier(.4,2,.3,1), background 0.3s;
+  background: var(--color-bg-card);
+  box-shadow: var(--color-shadow);
+  border-radius: 16px;
+  transition: all 0.3s ease;
   min-width: 240px;
   max-width: 320px;
   min-height: 410px;
@@ -49,16 +49,25 @@ function getImage(path) {
   align-items: center;
   justify-content: flex-start;
   position: relative;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
 }
+
 .product-card:hover {
-  border: 2px solid #21ba45;
-  transform: translateY(-6px) scale(1.03);
+  border: 2px solid var(--color-primary);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--color-shadow-hover);
 }
 .card-img-top.object-fit-cover {
   object-fit: cover;
   width: 100%;
   height: 200px !important;
-  border-radius: 1.2rem 1.2rem 0 0;
+  border-radius: 16px 16px 0 0;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img-top.object-fit-cover {
+  transform: scale(1.05);
 }
 .card-body {
   flex: 1 1 auto;

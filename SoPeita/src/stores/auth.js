@@ -4,7 +4,7 @@ import { login as loginApi, getUser } from '../services/HttpService'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') || '',
-    user: null,
+    user: JSON.parse(localStorage.getItem('user')) || null,
     role: localStorage.getItem('role') || ''
   }),
   actions: {
@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
       this.role = data.user.role
       localStorage.setItem('token', data.token)
       localStorage.setItem('role', data.user.role)
+      localStorage.setItem('user', JSON.stringify(data.user))
     },
     logout() {
       this.token = ''
@@ -22,11 +23,14 @@ export const useAuthStore = defineStore('auth', {
       this.role = ''
       localStorage.removeItem('token')
       localStorage.removeItem('role')
+      localStorage.removeItem('user')
     },
     async fetchProfile() {
       const data = await getUser()
       this.user = data
       this.role = data.role
+      localStorage.setItem('user', JSON.stringify(data))
+      localStorage.setItem('role', data.role)
     }
   }
 }) 

@@ -3,7 +3,6 @@
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
     <div class="carousel-inner rounded-4 shadow">
       <div class="carousel-item active">
@@ -13,7 +12,6 @@
             <h2 class="caption-title">Nova Coleção</h2>
             <p class="caption-desc">2024 chegou!</p>
           </div>
-          <a href="#produtos" class="carousel-btn-fixed btn btn-success btn-lg rounded-pill fw-bold shadow">Ver coleção</a>
         </div>
       </div>
       <div class="carousel-item">
@@ -23,17 +21,6 @@
             <h2 class="caption-title">Frete Grátis</h2>
             <p class="caption-desc">Acima de R$ 199</p>
           </div>
-          <a href="#produtos" class="carousel-btn-fixed btn btn-success btn-lg rounded-pill fw-bold shadow">Aproveite</a>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img :src="banner3" class="d-block w-100 img-fluid banner-img" alt="Compre 2, leve 3">
-        <div class="carousel-caption custom-caption">
-          <div class="caption-content">
-            <h2 class="caption-title">Compre 2, leve 3</h2>
-            <p class="caption-desc">Só nas camisetas</p>
-          </div>
-          <a href="#produtos" class="carousel-btn-fixed btn btn-success btn-lg rounded-pill fw-bold shadow">Ver ofertas</a>
         </div>
       </div>
     </div>
@@ -51,7 +38,6 @@
 <script setup>
 import banner1 from '../assets/banner1.png'
 import banner2 from '../assets/banner2.png'
-import banner3 from '../assets/banner3.png'
 // Nenhuma lógica JS necessária, Bootstrap faz tudo
 </script>
 

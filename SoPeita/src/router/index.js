@@ -6,7 +6,6 @@ import ProdutosView from '../views/ProdutosView.vue'
 import AdminView from '../views/AdminView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import PerfilView from '../views/PerfilView.vue'
-import AboutView from '../views/AboutView.vue'
 import CartView from '../views/CartView.vue'
 // Componente para página não encontrada (crie depois)
 const NotFoundView = { template: '<div>Página não encontrada</div>' }
@@ -26,9 +25,8 @@ const routes = [
   { path: '/register', name: 'register', component: RegisterView },
   { path: '/produtos', name: 'produtos', component: ProdutosView },
   { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAuth: true, role: 'ADMIN' } },
-  { path: '/checkout', name: 'checkout', component: CheckoutView, meta: { requiresAuth: true, role: 'CLIENT' } },
+  { path: '/checkout', name: 'checkout', component: CheckoutView, meta: { requiresAuth: true } },
   { path: '/perfil', name: 'perfil', component: PerfilView, meta: { requiresAuth: true } },
-  { path: '/sobre', name: 'about', component: AboutView },
   { path: '/carrinho', name: 'carrinho', component: CartView },
   // Rota para página não encontrada
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundView },

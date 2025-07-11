@@ -73,9 +73,9 @@ onMounted(async () => {
 async function addToCart() {
   try {
     await cartStore.addItem(product.value.id, 1)
-    showMsg.value = true
+  showMsg.value = true
     showToast('Produto adicionado ao carrinho!', 'success')
-    setTimeout(() => showMsg.value = false, 1500)
+  setTimeout(() => showMsg.value = false, 1500)
   } catch (e) {
     showToast('Erro ao adicionar ao carrinho.', 'error')
   }

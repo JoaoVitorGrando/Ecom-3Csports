@@ -89,16 +89,32 @@ function logout() {
   opacity: 0;
 }
 .side-menu-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3); z-index: 1000;
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); 
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
+
 .side-menu {
-  position: fixed; top: 0; left: 0; width: 290px; height: 100vh;
-  background: #fff; z-index: 1100; box-shadow: 2px 0 16px rgba(0,0,0,0.12);
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 290px; 
+  height: 100vh;
+  background: var(--color-bg-card); 
+  z-index: 1100; 
+  box-shadow: var(--color-shadow-strong);
   padding: 2rem 1.5rem 1.5rem 1.5rem;
-  display: flex; flex-direction: column;
-  border-top-right-radius: 18px;
-  border-bottom-right-radius: 18px;
+  display: flex; 
+  flex-direction: column;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-right: 1px solid var(--color-border);
 }
 .close-btn {
   background: none; border: none; font-size: 2.2rem; align-self: flex-end; color: #888;
@@ -106,21 +122,28 @@ function logout() {
 }
 .close-btn:hover { color: #e74c3c; }
 .nav-link {
-  display: flex; align-items: center;
-  border-radius: 1.5rem;
-  transition: background 0.2s, color 0.2s;
-  padding: 0.7rem 1.2rem;
+  display: flex; 
+  align-items: center;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  padding: 12px 16px;
+  color: var(--color-text);
+  text-decoration: none;
 }
+
 .nav-link:hover {
-  background: #f0f0f0;
-  color: #198754 !important;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary) !important;
+  transform: translateX(4px);
 }
+
 [data-theme="dark"] .side-menu {
-  background: #232323;
-  color: #fff;
+  background: var(--color-bg-card);
+  color: var(--color-text);
 }
+
 [data-theme="dark"] .nav-link:hover {
-  background: #232323;
-  color: #fff !important;
+  background: rgba(37, 99, 235, 0.2);
+  color: var(--color-primary) !important;
 }
 </style> 

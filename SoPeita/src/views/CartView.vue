@@ -37,9 +37,9 @@
           <button class="btn btn-outline-danger" @click="limparCarrinho">
             Limpar carrinho
           </button>
-          <router-link to="/checkout" class="btn btn-success px-4">
+          <button class="btn btn-success px-4" @click="irParaCheckout">
             Finalizar compra
-          </router-link>
+          </button>
         </div>
       </div>
     </div>
@@ -52,9 +52,11 @@ import { onMounted, computed } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { showToast } from '@/utils/toast'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const cartStore = useCartStore()
 const auth = useAuthStore()
+const router = useRouter()
 
 const items = computed(() => cartStore.items)
 const loading = computed(() => cartStore.loading)
@@ -86,5 +88,9 @@ async function limparCarrinho() {
   } catch (e) {
     showToast('Erro ao limpar carrinho: ' + (e?.detail || e?.message || 'Erro interno'), 'error')
   }
+}
+
+function irParaCheckout() {
+  router.push('/checkout')
 }
 </script> 
