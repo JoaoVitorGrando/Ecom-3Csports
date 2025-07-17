@@ -42,18 +42,6 @@ export async function getUser() {
   return (await API.get('users/me')).data
 }
 
-// Adicionar função para buscar todos os usuários
-export async function getAllUsers() {
-  try {
-    const res = await API.get('users/')
-    console.log('getAllUsers response:', res.data)
-    return res.data
-  } catch (e) {
-    console.error('getAllUsers error:', e?.response?.data || e)
-    throw e
-  }
-}
-
 export async function changeUserInfos(payload) {
   return (await API.put('users/me', payload)).data
 }
@@ -238,4 +226,29 @@ export async function renewToken() {
 
 export async function verifyToken() {
   return (await API.get('verify-token')).data
+} 
+
+// ========== TAGS ==========
+export async function getTags() {
+  return (await API.get('tags/')).data
+}
+
+export async function createTag(payload) {
+  return (await API.post('tags/', payload)).data
+}
+
+export async function updateTag(tagId, payload) {
+  return (await API.put(`tags/${tagId}`, payload)).data
+}
+
+export async function deleteTag(tagId) {
+  return (await API.delete(`tags/${tagId}`)).data
+}
+
+export async function addProductToTag(tagId, productId) {
+  return (await API.post(`tags/${tagId}/products/${productId}`)).data
+}
+
+export async function removeProductFromTag(tagId, productId) {
+  return (await API.delete(`tags/${tagId}/products/${productId}`)).data
 } 

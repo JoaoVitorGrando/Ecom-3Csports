@@ -15,13 +15,14 @@
       </form>
       <!-- Itens desktop -->
       <ul class="nav nav-categories d-none d-lg-flex ms-4">
-        <li v-for="cat in categories" :key="cat.id" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">{{ cat.name }}</a>
-          <ul class="dropdown-menu">
-            <li v-for="sub in cat.subcategories" :key="sub.id">
-              <router-link class="dropdown-item" :to="{ name: 'produtos', query: { categoria: cat.id, subcategoria: sub.id } }">{{ sub.name }}</router-link>
-            </li>
-          </ul>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Futebol' } }">Futebol</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Corrida' } }">Corrida</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Academia' } }">Academia</router-link>
         </li>
       </ul>
       <!-- Carrinho -->
@@ -37,32 +38,35 @@
         <button @click="toggleTheme" class="btn btn-outline-secondary btn-sm rounded-pill d-none d-md-flex" :title="isDark ? 'Tema claro' : 'Tema escuro'">
           <i :class="isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill'"></i>
         </button>
-        <button @click="openCartDrawer" class="btn bg-amarelo position-relative d-flex align-items-center justify-content-center rounded-pill px-3" style="min-width:48px; height:44px;">
+        <button v-if="user?.role === 'CLIENT' || user?.role === 'ADMIN'" @click="openCartDrawer" class="btn bg-amarelo position-relative d-flex align-items-center justify-content-center rounded-pill px-3" style="min-width:48px; height:44px;">
           <i class="bi bi-cart3 icon-preto" style="font-size:1.5rem;"></i>
-          <span v-if="cartCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.95rem; min-width:22px; left:38px; top:6px;">{{ cartCount }}</span>
+          <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge-count">{{ cartCount }}</span>
         </button>
         <template v-if="isAuth">
           <div class="dropdown profile-dropdown">
             <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:44px; height:44px;">
               <i class="bi bi-person-circle" style="font-size:1.5rem;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end mt-2 shadow profile-menu">
-              <li class="px-3 py-2">
-                <div class="fw-bold">{{ user?.name || user?.email }}</div>
-                <div class="small text-muted">{{ user?.email }}</div>
-                <div class="badge bg-success mt-2">{{ user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'MODERATOR' ? 'Moderador' : 'Cliente' }}</div>
+            <ul class="dropdown-menu dropdown-menu-end mt-2 shadow profile-menu profile-dropdown-custom">
+              <li class="profile-header px-3 py-3 text-center">
+                <div class="profile-name fw-bold mb-1">{{ user?.name || user?.email }}</div>
+                <div class="profile-email small text-muted mb-2">{{ user?.email }}</div>
+                <div class="badge bg-success profile-role">{{ user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'MODERATOR' ? 'Moderador' : 'Cliente' }}</div>
               </li>
-              <li><hr class="dropdown-divider"></li>
+              <!-- Removido divider para visual mais limpo -->
               <li v-if="user?.role === 'ADMIN'">
-                <router-link class="dropdown-item" to="/admin"><i class="bi bi-speedometer2 me-2"></i> Painel Admin</router-link>
+                <router-link class="dropdown-item profile-dropdown-item" to="/admin"><i class="bi bi-speedometer2 me-2"></i> Painel Admin</router-link>
               </li>
-              <li><router-link class="dropdown-item" to="/perfil"><i class="bi bi-person-lines-fill me-2"></i> Meu Perfil</router-link></li>
-              <li><button class="dropdown-item text-danger" @click="logout"><i class="bi bi-box-arrow-right me-2"></i> Sair</button></li>
+              <li v-if="user?.role === 'MODERATOR'">
+                <router-link class="dropdown-item profile-dropdown-item" to="/moderador"><i class="bi bi-speedometer2 me-2"></i> Painel Moderador</router-link>
+              </li>
+              <li><router-link class="dropdown-item profile-dropdown-item" to="/perfil"><i class="bi bi-person-lines-fill me-2"></i> Meu Perfil</router-link></li>
+              <li><button class="dropdown-item profile-dropdown-item no-hover" @click="logout"><i class="bi bi-box-arrow-right me-2"></i> Sair</button></li>
             </ul>
           </div>
         </template>
         <template v-else>
-          <router-link to="/login" class="btn btn-outline-success rounded-pill px-3">Entrar</router-link>
+          <router-link to="/login" class="btn btn-outline-amarelo rounded-pill px-3">Entrar</router-link>
         </template>
       </div>
       <CartDrawer :open="cartDrawer.isOpen" @close="cartDrawer.closeDrawer" />
@@ -131,12 +135,7 @@ function onSearch() {
   }
 }
 
-// Mock de categorias/subcategorias (substituir por chamada à API futuramente)
-const categories = ref([
-  { id: 1, name: 'Futebol', subcategories: [ { id: 11, name: 'Chuteiras' }, { id: 12, name: 'Bolas' } ] },
-  { id: 2, name: 'Corrida', subcategories: [ { id: 21, name: 'Tênis' }, { id: 22, name: 'Acessórios' } ] },
-  { id: 3, name: 'Academia', subcategories: [ { id: 31, name: 'Roupas' }, { id: 32, name: 'Equipamentos' } ] }
-])
+// Remover o bloco de categories/subcategories e o mock de categories do script.
 
 onMounted(() => {
   cartStore.fetchItems()
@@ -173,7 +172,7 @@ onMounted(() => {
 }
 .site-title-link {
   text-decoration: none !important;
-  color: #18181b !important;
+  color: #18181b;
 }
 .site-title {
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -211,7 +210,7 @@ onMounted(() => {
 }
 .nav-categories .nav-link,
 .nav-categories-mobile .nav-link {
-  color: #18181b !important;
+  color: #18181b;
   font-weight: 600;
   font-size: 1.08rem;
   transition: color 0.2s;
@@ -317,5 +316,76 @@ onMounted(() => {
 .profile-menu .dropdown-item:active, .profile-menu .dropdown-item:focus {
   background: #e9fbe7;
   color: #21ba45;
+}
+.btn-outline-amarelo {
+  border: 2px solid #FFD600;
+  color: #18181b !important;
+  background: transparent;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-outline-amarelo:hover, .btn-outline-amarelo:focus {
+  background: #FFD600 !important;
+  color: #18181b !important;
+  border-color: #FFD600 !important;
+}
+/* Badge de contagem do carrinho */
+.cart-badge-count {
+  font-size: 0.78rem;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 36px !important;
+  top: 2px !important;
+  z-index: 2;
+  border: 1.5px solid #ecae27;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  padding: 0 2px;
+  margin: 0 !important;
+}
+/* Mini modal de perfil mais bonito */
+.profile-dropdown-custom {
+  min-width: 220px;
+  border-radius: 16px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  background: #fff;
+}
+.profile-header {
+  margin-bottom: 0.2rem;
+  border-bottom: none;
+}
+.profile-name {
+  font-size: 1.13rem;
+  color: #222;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.profile-email {
+  color: #888;
+  font-size: 0.97rem;
+}
+.profile-role {
+  font-size: 0.92rem;
+  margin-top: 0.2rem;
+}
+/* Itens do dropdown de perfil com hover igual */
+.profile-dropdown-item {
+  transition: background 0.18s, color 0.18s;
+}
+.profile-dropdown-item:hover, .profile-dropdown-item:focus {
+  background: #f7f7f7 !important;
+  color: #f5aa1e !important;
+}
+/* Botão 'Sair' com mesmo hover dos outros itens, sem movimento */
+.no-hover:hover, .no-hover:focus {
+  background: #f7f7f7 !important;
+  color: #f5aa1e !important;
+  transition: background 0.18s, color 0.18s;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 </style> 

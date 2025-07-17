@@ -349,3 +349,246 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-muted);
 }
+
+[data-theme="dark"] .text-preto,
+[data-theme="dark"] .icon-preto,
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .site-title-link,
+[data-theme="dark"] .nav-link,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-text,
+[data-theme="dark"] .fw-bold,
+[data-theme="dark"] .display-4,
+[data-theme="dark"] .display-3,
+[data-theme="dark"] .display-2,
+[data-theme="dark"] .display-1,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .badge,
+[data-theme="dark"] .bi,
+[data-theme="dark"] .btn,
+[data-theme="dark"] .profile-name,
+[data-theme="dark"] .profile-email,
+[data-theme="dark"] .profile-role,
+[data-theme="dark"] .admin-ola,
+[data-theme="dark"] .dashboard-title-custom,
+[data-theme="dark"] .sidebar-btn,
+[data-theme="dark"] .admin-sidebar,
+[data-theme="dark"] .admin-header,
+[data-theme="dark"] .admin-main,
+[data-theme="dark"] .produto-card,
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-title,
+[data-theme="dark"] .modal-desc,
+[data-theme="dark"] .modal-price,
+[data-theme="dark"] .modal-category,
+[data-theme="dark"] .modal-stock,
+[data-theme="dark"] .footer-link-minimal,
+[data-theme="dark"] .footer-brand-minimal,
+[data-theme="dark"] .footer-social-minimal,
+[data-theme="dark"] .footer-minimal,
+[data-theme="dark"] .perfil-title,
+[data-theme="dark"] .perfil-logo,
+[data-theme="dark"] .login-title,
+[data-theme="dark"] .login-logo,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .btn-login,
+[data-theme="dark"] .btn-perfil,
+[data-theme="dark"] .perfil-success,
+[data-theme="dark"] .login-links a {
+  color: #fff !important;
+}
+[data-theme="dark"] .bg-preto {
+  background-color: #fff !important;
+  color: #18181b !important;
+}
+[data-theme="dark"] .form-control {
+  background: #222 !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+[data-theme="dark"] .card, [data-theme="dark"] .produto-card, [data-theme="dark"] .admin-main, [data-theme="dark"] .admin-header, [data-theme="dark"] .admin-sidebar, [data-theme="dark"] .modal-content, [data-theme="dark"] .footer-minimal {
+  background: #18181b !important;
+  color: #fff !important;
+  border-color: #333 !important;
+}
+[data-theme="dark"] .badge.bg-secondary, [data-theme="dark"] .badge.bg-warning {
+  background: #FFD600 !important;
+  color: #18181b !important;
+}
+[data-theme="dark"] .badge.bg-danger {
+  background: #dc2626 !important;
+  color: #fff !important;
+}
+[data-theme="dark"] .btn, [data-theme="dark"] .btn-login, [data-theme="dark"] .btn-perfil {
+  background: #FFD600 !important;
+  color: #18181b !important;
+  border-color: #FFD600 !important;
+}
+[data-theme="dark"] .btn:hover, [data-theme="dark"] .btn-login:hover, [data-theme="dark"] .btn-perfil:hover {
+  background: #fff !important;
+  color: #FFD600 !important;
+}
+[data-theme="dark"] .form-label {
+  color: #fff !important;
+}
+[data-theme="dark"] .perfil-success {
+  background: #333 !important;
+  color: #FFD600 !important;
+  border-color: #FFD600 !important;
+}
+[data-theme="dark"] .login-links a {
+  color: #FFD600 !important;
+}
+[data-theme="dark"] .nav-link {
+  color: #fff !important;
+}
+[data-theme="dark"] .form-control {
+  color: #fff !important;
+  background: #18181b !important;
+  border-color: #333 !important;
+}
+[data-theme="dark"] .form-control::placeholder {
+  color: #fff !important;
+  opacity: 0.7;
+}
+[data-theme="dark"] .site-title-link span:first-child,
+[data-theme="dark"] h1.display-3 span:first-child {
+  color: #fff !important;
+}
+[data-theme="dark"] .site-title-link .text-amarelo,
+[data-theme="dark"] h1.display-3 .text-amarelo {
+  color: #FFD600 !important;
+}
+[data-theme="dark"] h2.display-4 {
+  color: #fff !important;
+}
+
+/* Estilos para seções da home inspiradas no site lojablackhype.com */
+.banner-promocional, .menu-categorias, .vantagens, .depoimentos {
+  margin-bottom: 2.5rem;
+}
+
+.menu-categorias .nav-link, .menu-categorias .dropdown-item {
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+.vant-card, .depo-card {
+  transition: box-shadow 0.2s;
+}
+.vant-card:hover, .depo-card:hover {
+  box-shadow: 0 4px 24px rgba(24,24,27,0.10);
+}
+
+/* Ajuste para títulos das seções */
+.home h2, .vantagens h2, .depoimentos h2 {
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 800;
+  color: #18181b;
+  letter-spacing: -0.01em;
+}
+
+/* Ajuste para responsividade das novas seções */
+@media (max-width: 900px) {
+  .banner-promocional, .menu-categorias, .vantagens, .depoimentos {
+    margin-bottom: 1.2rem;
+  }
+}
+
+.institucional {
+  background: #fffbe6;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px rgba(24,24,27,0.04);
+  margin-bottom: 2.5rem;
+}
+.institucional h3, .institucional h4 {
+  color: #18181b;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 800;
+}
+.institucional p, .institucional ul {
+  font-size: 1.08rem;
+  color: #222;
+}
+.institucional .btn-amarelo {
+  background: #FFD600;
+  color: #18181b;
+  border: none;
+  border-radius: 1.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.institucional .btn-amarelo:hover {
+  background: #18181b;
+  color: #FFD600;
+}
+
+.home {
+  padding-top: 0 !important;
+}
+.content-home {
+  padding-top: 0 !important;
+}
+.banner-promocional {
+  margin-top: 0 !important;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.menu-categorias {
+  margin-top: 0 !important;
+  border-radius: 0 0 1rem 1rem;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  transform: translateX(-50%);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(24,24,27,0.04);
+}
+@media (max-width: 991px) {
+  .menu-categorias {
+    display: none !important;
+  }
+}
+
+.banner-extra {
+  width: 100%;
+  min-height: 180px;
+  background: #fffbe6;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px rgba(24,24,27,0.04);
+  overflow: hidden;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+.banner-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 1.2rem;
+}
+
+.content-home > section, .content-home > .row, .content-home > .banner-extra {
+  margin-bottom: 2.5rem;
+}
+
+.banner-principal-destaque {
+  min-height: 320px;
+  height: 32vw;
+  max-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background: none;
+  box-shadow: none;
+}
+@media (max-width: 900px) {
+  .banner-principal-destaque {
+    min-height: 180px;
+    height: 38vw;
+    max-height: 260px;
+  }
+}

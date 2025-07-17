@@ -17,7 +17,7 @@
               <i class="bi bi-bag me-2"></i> Produtos
             </a>
           </li>
-          <li class="nav-item">
+          <li v-if="user?.role === 'CLIENT'" class="nav-item">
             <a class="nav-link fw-bold fs-5" href="#" @click.prevent="navigate('/carrinho')">
               <i class="bi bi-cart3 me-2"></i> Carrinho
             </a>

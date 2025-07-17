@@ -27,7 +27,7 @@
               </div>
               <!-- Botão adicionar novo endereço -->
               <div class="d-flex justify-content-center">
-                <button class="btn btn-outline-primary rounded-pill mt-2 py-2 btn-sm btn-adc-endereco" style="max-width:220px;width:100%;" @click="showNovoEndereco = !showNovoEndereco">
+                <button class="btn btn-outline-secondary rounded-pill mt-2 py-2 btn-sm btn-adc-endereco" style="max-width:220px;width:100%;" @click="showNovoEndereco = !showNovoEndereco">
                   <span v-if="!showNovoEndereco">Adicionar novo endereço</span>
                   <span v-else>Cancelar</span>
                 </button>
@@ -40,10 +40,10 @@
                 <input v-model="novoEndereco.state" class="form-control mb-1" placeholder="Estado" required />
                 <input v-model="novoEndereco.country" class="form-control mb-1" placeholder="País" required />
                 <!-- Botão salvar endereço -->
-                <button class="btn btn-primary rounded-pill w-100 mt-1 py-2 btn-sm" type="submit">Salvar endereço</button>
+                <button class="btn btn-secondary rounded-pill w-100 mt-1 py-2 btn-sm" type="submit">Salvar endereço</button>
               </form>
               <!-- Botão continuar para pagamento -->
-              <button class="btn btn-primary rounded-pill w-100 mt-3 btn-lg py-2" :disabled="!enderecos.length" @click="etapa = 2">
+              <button class="btn btn-secondary rounded-pill w-100 mt-3 btn-lg py-2" :disabled="!enderecos.length" @click="etapa = 2">
                 Continuar para pagamento
               </button>
             </div>
@@ -95,9 +95,9 @@
                 </div>
               </div>
               <!-- Botão voltar -->
-              <button class="btn btn-outline-primary rounded-pill w-100 mt-3 btn-lg py-2" @click="etapa = 1">Voltar</button>
+              <button class="btn btn-outline-secondary rounded-pill w-100 mt-3 btn-lg py-2" @click="etapa = 1">Voltar</button>
               <!-- Botão revisar pedido -->
-              <button class="btn btn-primary rounded-pill w-100 mt-2 btn-lg py-2" @click="etapa = 3">
+              <button class="btn btn-secondary rounded-pill w-100 mt-2 btn-lg py-2" @click="etapa = 3">
                 Revisar pedido
               </button>
             </div>
@@ -132,9 +132,9 @@
                 <span class="fs-5 fw-bold text-success">R$ {{ total.toFixed(2) }}</span>
               </div>
               <!-- Botão voltar -->
-              <button class="btn btn-outline-primary rounded-pill w-100 mt-3 btn-lg py-2" @click="etapa = 2">Voltar</button>
+              <button class="btn btn-outline-secondary rounded-pill w-100 mt-3 btn-lg py-2" @click="etapa = 2">Voltar</button>
               <!-- Botão pagar -->
-              <button class="btn btn-primary rounded-pill w-100 mt-2 btn-lg py-2 d-flex align-items-center justify-content-center gap-2" @click="finalizarCompra" :disabled="compraFinalizada">
+              <button class="btn btn-secondary rounded-pill w-100 mt-2 btn-lg py-2 d-flex align-items-center justify-content-center gap-2" @click="finalizarCompra" :disabled="compraFinalizada">
                 <i class="bi bi-lock-fill"></i>
                 <span v-if="!compraFinalizada">Pagar com segurança</span>
                 <span v-else>Compra realizada! <i class="bi bi-check-circle ms-2"></i></span>
@@ -152,7 +152,7 @@
             <!-- Campo para aplicar cupom -->
             <form class="mb-3 d-flex gap-2" @submit.prevent="aplicarCupom">
               <input v-model="codigoCupom" class="form-control rounded-pill" placeholder="Cupom de desconto" style="max-width:180px;" />
-              <button class="btn btn-outline-primary rounded-pill px-3" type="submit">Aplicar</button>
+              <button class="btn btn-outline-secondary rounded-pill px-3" type="submit">Aplicar</button>
             </form>
             <div v-if="cupomMensagem" :class="['mb-2', cupomValido ? 'text-success' : 'text-danger']" style="font-size:0.97rem;">{{ cupomMensagem }}</div>
             <div v-for="item in items" :key="item.id" class="d-flex align-items-center mb-2">
@@ -220,6 +220,14 @@ const desconto = computed(() => descontoCupom.value)
 const total = computed(() => subtotal.value + frete.value - desconto.value)
 
 async function adicionarEndereco() {
+  // Validação simples dos campos obrigatórios
+  const camposObrigatorios = ['street', 'number', 'zip', 'city', 'state', 'country'];
+  for (const campo of camposObrigatorios) {
+    if (!novoEndereco.value[campo] || String(novoEndereco.value[campo]).trim() === '') {
+      showToast('Preencha todos os campos do endereço corretamente!', 'error');
+      return;
+    }
+  }
   try {
     await addressesStore.createAddress({ ...novoEndereco.value })
     showToast('Endereço adicionado!', 'success')
@@ -238,11 +246,12 @@ async function finalizarCompra() {
     return
   }
   try {
-    await newOrder({
-      items: items.value.map(item => ({ product_id: item.product.id, quantity: item.quantity })),
-      address_id: enderecoSelecionado.value,
-      payment: pagamento.value
-    })
+    // Se houver cupom válido, envie o ID do cupom. Caso contrário, envie só o address_id
+    const payload = { address_id: enderecoSelecionado.value };
+    if (cupomValido.value && typeof cupomID !== 'undefined') {
+      payload.coupon_id = cupomID;
+    }
+    await newOrder(payload)
     showToast('Compra finalizada com sucesso!', 'success')
     await cartStore.clearItems()
     compraFinalizada.value = true
@@ -332,8 +341,9 @@ function getImage(path) {
   transition: background 0.18s, border-color 0.18s, color 0.18s;
 }
 .btn-adc-endereco:hover, .btn-adc-endereco:focus {
-  background: #eaf3fb;
-  border-color: #1976d2;
-  color: #1976d2;
+  background: #fffde7;
+  border-color: var(--color-secondary-light);
+  color: var(--cor-preto);
+  box-shadow: 0 2px 8px 0 rgba(251, 191, 36, 0.10); /* sombra amarela suave */
 }
 </style> 

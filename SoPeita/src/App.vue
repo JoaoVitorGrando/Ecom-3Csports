@@ -1,16 +1,19 @@
 <template>
-  <div class="app-container">
-    <Header />
-    <main class="w-100 p-0 m-0">
-      <router-view />
-    </main>
-    <Footer />
+  <div>
+    <Header v-if="!isAuthPage" />
+    <router-view />
+    <Footer v-if="!isAuthPage" />
   </div>
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
+
+const route = useRoute()
+const isAuthPage = computed(() => route.path === '/login' || route.path === '/register')
 </script>
 
 <style scoped>

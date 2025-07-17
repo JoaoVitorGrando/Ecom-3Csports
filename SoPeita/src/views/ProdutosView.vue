@@ -4,61 +4,75 @@
     <div v-if="loading" class="text-center">Carregando produtos...</div>
     <div v-else-if="erro" class="alert alert-danger text-center">{{ erro }}</div>
     <div v-else class="produtos-grid">
-      <div v-for="produto in produtos" :key="produto.id" class="produto-card-wrapper">
-        <div class="produto-card card h-100 shadow-sm hover-lift">
-          <img :src="'http://35.196.79.227:8000' + produto.image_path" class="card-img-top" :alt="produto.name">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ produto.name }}</h5>
-            <p class="card-text text-muted mb-1">{{ produto.description }}</p>
-            <p class="fw-bold text-gradient mb-1">R$ {{ Number(produto.price).toFixed(2) }}</p>
-            <span class="badge bg-secondary mb-2">Estoque: {{ produto.stock }}</span>
-            <span class="badge bg-info mb-2">Categoria: {{ produto.category?.name }}</span>
-            <button v-if="userRole==='ADMIN' || userRole==='MODERATOR'" class="btn btn-outline-primary mt-auto" @click="abrirModal(produto)">Ver detalhes</button>
-            <button v-if="userRole==='CLIENT'" class="btn btn-primary mt-auto" @click="adicionarAoCarrinho(produto)">Adicionar ao carrinho</button>
-          </div>
-        </div>
+      <div v-for="produto in produtosFiltrados" :key="produto.id" class="produto-card-wrapper">
+        <ProductCard
+          :product="produto"
+          :show-cart-btn="true"
+          @add-to-cart="handleAddToCart"
+        />
       </div>
     </div>
   </div>
-  <ModalProduto
-    v-if="produtoSelecionado"
-    :produto="produtoSelecionado"
-    :show="mostrarModal"
-    @close="fecharModal"
-    @add-to-cart="adicionarAoCarrinho"
-  />
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useProductsStore } from '@/stores/products'
 import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
-import ModalProduto from '@/components/ModalProduto.vue'
+import ProductCard from '@/components/ProductCard.vue'
 
 const productsStore = useProductsStore()
 const produtos = computed(() => productsStore.products)
 const loading = computed(() => productsStore.loading)
 const erro = computed(() => productsStore.error)
 
-const produtoSelecionado = ref(null)
-const mostrarModal = ref(false)
-
 const auth = useAuthStore()
 const userRole = auth.role
 
-function abrirModal(produto) {
-  produtoSelecionado.value = produto
-  mostrarModal.value = true
-}
-function fecharModal() {
-  mostrarModal.value = false
-  produtoSelecionado.value = null
-}
+const route = useRoute()
+
+const meuUserId = 221 //produtos criados com o id de adm serão visualizados por todos que acessarem o site
+const produtosFiltrados = computed(() => {
+  const categoriaSelecionada = route.query.categoria
+  if (categoriaSelecionada) {
+    return produtos.value.filter(produto =>
+      produto.category?.user_id === meuUserId && produto.category?.name === categoriaSelecionada
+    )
+  }
+  return produtos.value.filter(produto =>
+    produto.category?.user_id === meuUserId
+  )
+})
+
+watch(() => route.query.categoria, () => {}, { immediate: true })
+
 function adicionarAoCarrinho(produto) {
+  if (!auth.token) {
+    showToast('Faça login para adicionar produtos ao carrinho.', 'warning')
+    window.location.href = '/login'
+    return
+  }
   // Aqui você pode integrar com o carrinho, exibir toast, etc.
   showToast(`Produto "${produto.name}" adicionado ao carrinho!`, 'success')
-  fecharModal()
+}
+
+async function handleAddToCart(product) {
+  if (!auth.token) {
+    showToast('Faça login para adicionar produtos ao carrinho.', 'warning')
+    window.location.href = '/login'
+    return
+  }
+  try {
+    await productsStore.createCart?.()
+    await productsStore.addItems?.({ product_id: Number(product.id), quantity: 1, unit_price: Number(product.price), size: 'M' })
+    showToast('Produto adicionado ao carrinho!', 'success')
+    // Se usar store/cartDrawer:
+    try { const cartDrawer = (await import('@/stores/cartDrawer')).useCartDrawerStore(); cartDrawer().openDrawer(); } catch {}
+  } catch (e) {
+    showToast('Erro ao adicionar ao carrinho.', 'error')
+  }
 }
 
 onMounted(async () => {

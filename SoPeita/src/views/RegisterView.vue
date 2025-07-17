@@ -1,11 +1,12 @@
 <template>
-  <div class="container d-flex align-items-center justify-content-center min-vh-100">
-    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-      <h2 class="mb-4 text-center fw-bold text-success">Registrar</h2>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo"><span>3C </span><span class="amarelo">sports</span></div>
+      <h2 class="login-title">Registrar-se</h2>
       <form @submit.prevent="handleRegister">
         <div class="mb-3">
-          <label for="nome" class="form-label">Nome</label>
-          <input v-model="nome" type="text" class="form-control" id="nome" required />
+          <label for="name" class="form-label">Nome</label>
+          <input v-model="name" type="text" class="form-control" id="name" required />
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">E-mail</label>
@@ -15,12 +16,11 @@
           <label for="senha" class="form-label">Senha</label>
           <input v-model="senha" type="password" class="form-control" id="senha" required />
         </div>
-        <button type="submit" class="btn btn-success w-100 fw-bold">Registrar</button>
-        <div v-if="error" class="alert alert-danger mt-3 py-2 text-center">{{ error }}</div>
-        <div v-if="success" class="alert alert-success mt-3 py-2 text-center">Usuário registrado com sucesso! Faça login.</div>
+        <button type="submit" class="btn-login">Registrar</button>
+        <div v-if="error" class="login-error mt-3">{{ error }}</div>
       </form>
-      <div class="text-center mt-3">
-        <router-link to="/login" class="text-success">Já tem conta? Entrar</router-link>
+      <div class="login-links">
+        <router-link to="/login">Já tem uma conta? Entrar</router-link>
       </div>
     </div>
   </div>
@@ -29,30 +29,143 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { register } from '@/services/HttpService'
-import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
+import { register } from '@/services/HttpService'
 
-const nome = ref('')
+const name = ref('')
 const email = ref('')
 const senha = ref('')
 const error = ref('')
-const success = ref(false)
 const router = useRouter()
-const auth = useAuthStore()
 
 async function handleRegister() {
-  error.value = ''
-  success.value = false
   try {
-    await register({ name: nome.value, email: email.value, password: senha.value })
-    // Login automático após registro
-    await auth.login(email.value, senha.value)
-    showToast('Usuário registrado com sucesso!', 'success')
-    setTimeout(() => router.push('/'), 1500)
+    await register({ name: name.value, email: email.value, password: senha.value })
+    showToast('Cadastro realizado com sucesso!', 'success')
+    router.push('/login')
   } catch (e) {
-    error.value = e?.detail || e?.message || 'Erro ao registrar usuário.'
-    showToast('Erro ao registrar: ' + error.value, 'error')
+    let msg = 'Erro ao registrar!'
+    if (e?.response?.data?.detail) {
+      msg = Array.isArray(e.response.data.detail)
+        ? e.response.data.detail.map(d => d.msg || d).join(' | ')
+        : e.response.data.detail
+    } else if (e?.detail) {
+      msg = e.detail
+    } else if (e?.message) {
+      msg = e.message
+    }
+    error.value = msg
+    showToast('Erro ao registrar: ' + msg, 'error')
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.login-container {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #18181b 60%, #FFD600 100%);
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+.login-card {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 4px 32px rgba(24,24,27,0.10);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 !important;
+}
+.login-logo {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 1.2rem;
+  color: #18181b;
+}
+.login-logo .amarelo {
+  color: #FFD600;
+}
+.login-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #18181b;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.form-label {
+  color: #18181b;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.form-control {
+  border-radius: 1.5rem;
+  border: 1.5px solid #FFD600;
+  padding: 0.9rem 1.2rem;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+  background: #f8fafc;
+  color: #18181b;
+  transition: border 0.2s;
+}
+.form-control:focus {
+  border-color: #18181b;
+  background: #fffbe6;
+  outline: none;
+}
+.btn-login {
+  background: #FFD600;
+  color: #18181b;
+  font-weight: 700;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.9rem 0;
+  width: 100%;
+  font-size: 1.15rem;
+  box-shadow: 0 2px 12px rgba(255,214,0,0.10);
+  transition: background 0.2s, color 0.2s;
+}
+.btn-login:hover, .btn-login:focus {
+  background: #18181b;
+  color: #FFD600;
+}
+.login-links {
+  margin-top: 1.2rem;
+  text-align: center;
+}
+.login-links a {
+  color: #0a0a0a;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+.login-links a:hover {
+  color: #18181b;
+}
+.login-error {
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 1rem;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid #FFD600;
+}
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+</style> 

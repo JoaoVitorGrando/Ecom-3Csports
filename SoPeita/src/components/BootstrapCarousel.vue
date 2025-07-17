@@ -46,6 +46,8 @@ import banner2 from '../assets/banner2.png'
   width: 100%;
   max-width: 100%;
   height: 340px;
+  min-height: 340px;
+  max-height: 340px;
   object-fit: cover;
   background: var(--color-bg);
   transition: background 0.1s;

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { createCart, getCart, getCartItems, addItems, updateQnt, deleteInCart, clearCartItems } from '../services/HttpService'
+import { useAuthStore } from './auth'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
@@ -10,6 +11,8 @@ export const useCartStore = defineStore('cart', {
   }),
   actions: {
     async ensureCart() {
+      const authStore = useAuthStore()
+      if (!authStore.token) return // Não tenta buscar/criar carrinho se não autenticado
       try {
         this.cart = await getCart()
       } catch (e) {
@@ -21,6 +24,12 @@ export const useCartStore = defineStore('cart', {
       }
     },
     async fetchItems() {
+      const authStore = useAuthStore()
+      if (!authStore.token) {
+        this.items = []
+        this.cart = null
+        return
+      }
       this.loading = true
       try {
         await this.ensureCart()

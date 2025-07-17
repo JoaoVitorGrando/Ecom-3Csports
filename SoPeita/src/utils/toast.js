@@ -2,6 +2,10 @@ import Toastify from 'toastify-js'
 import 'toastify-js/src/toastify.css'
 
 export function showToast(message, type = 'success') {
+  let background = '#22c55e' // verde padrão para sucesso
+  if (type === 'error') background = '#dc2626' // vermelho para erro/acesso negado
+  else if (type === 'warning') background = '#FFD600' // amarelo para aviso
+
   Toastify({
     text: message,
     duration: 3200,
@@ -9,8 +13,8 @@ export function showToast(message, type = 'success') {
     position: 'right',
     className: `sop-toasty sop-toasty-${type}`,
     style: {
-      background: type === 'error' ? '#dc2626' : type === 'success' ? '#22c55e' : '#fbbf24',
-      color: '#fff',
+      background,
+      color: type === 'warning' ? '#18181b' : '#fff',
       border: 'none',
       borderRadius: '14px',
       fontSize: '1rem',

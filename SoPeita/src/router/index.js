@@ -7,6 +7,7 @@ import AdminView from '../views/AdminView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import PerfilView from '../views/PerfilView.vue'
 import CartView from '../views/CartView.vue'
+import ModeratorView from '../views/ModeratorView.vue'
 // Componente para página não encontrada (crie depois)
 const NotFoundView = { template: '<div>Página não encontrada</div>' }
 
@@ -24,7 +25,9 @@ const routes = [
   { path: '/login', name: 'login', component: LoginView },
   { path: '/register', name: 'register', component: RegisterView },
   { path: '/produtos', name: 'produtos', component: ProdutosView },
+  { path: '/produto/:id', name: 'detalhe-produto', component: () => import('../views/DetalheProdutoView.vue') },
   { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAuth: true, role: 'ADMIN' } },
+  { path: '/moderador', name: 'moderador', component: ModeratorView, meta: { requiresAuth: true, role: 'MODERATOR' } },
   { path: '/checkout', name: 'checkout', component: CheckoutView, meta: { requiresAuth: true } },
   { path: '/perfil', name: 'perfil', component: PerfilView, meta: { requiresAuth: true } },
   { path: '/carrinho', name: 'carrinho', component: CartView },
