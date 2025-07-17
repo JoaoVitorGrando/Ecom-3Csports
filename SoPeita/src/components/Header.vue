@@ -11,7 +11,7 @@
       <!-- Mobile: busca ao lado da logo -->
       <form class="search-bar d-flex d-md-none align-items-center ms-2 flex-shrink-1" @submit.prevent="onSearch" style="max-width: 140px; min-width: 0; height: 36px;">
         <input v-model="searchQuery" class="form-control rounded-pill px-2 py-1" placeholder="Buscar..." aria-label="Buscar produtos" style="font-size:0.98rem; height:32px;" />
-        <button type="submit" class="btn bg-amarelo rounded-pill ms-1 px-2 py-1 d-flex align-items-center justify-content-center" style="height:32px; font-size:1.1rem;"><i class="bi bi-search icon-preto"></i></button>
+        <button type="submit" class="btn btn-outline-preto rounded-pill ms-1 px-2 py-1 d-flex align-items-center justify-content-center" style="height:32px; font-size:1.1rem;"><i class="bi bi-search icon-preto"></i></button>
       </form>
       <!-- Itens desktop -->
       <ul class="nav nav-categories d-none d-lg-flex ms-4">
@@ -31,14 +31,14 @@
       <!-- Lupa busca desktop -->
       <form class="search-bar mx-auto flex-grow-1 d-none d-md-flex" @submit.prevent="onSearch" style="max-width: 340px; min-width: 180px;">
         <input v-model="searchQuery" type="text" class="form-control rounded-pill px-3" placeholder="Buscar produtos..." aria-label="Buscar produtos" />
-        <button type="submit" class="btn bg-amarelo rounded-pill ms-2 px-3 d-flex align-items-center justify-content-center"><i class="bi bi-search icon-preto"></i></button>
+        <button type="submit" class="btn btn-outline-preto rounded-pill ms-2 px-3 d-flex align-items-center justify-content-center"><i class="bi bi-search icon-preto"></i></button>
       </form>
       <!-- Lupa busca mobile -->
       <div class="d-flex align-items-center gap-2 ms-auto position-relative z-2">
         <button @click="toggleTheme" class="btn btn-outline-secondary btn-sm rounded-pill d-none d-md-flex" :title="isDark ? 'Tema claro' : 'Tema escuro'">
           <i :class="isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill'"></i>
         </button>
-        <button v-if="user?.role === 'CLIENT' || user?.role === 'ADMIN'" @click="openCartDrawer" class="btn bg-amarelo position-relative d-flex align-items-center justify-content-center rounded-pill px-3" style="min-width:48px; height:44px;">
+        <button v-if="user?.role === 'CLIENT' || user?.role === 'ADMIN'" @click="openCartDrawer" class="btn btn-outline-preto position-relative d-flex align-items-center justify-content-center rounded-pill px-3" style="min-width:48px; height:44px;">
           <i class="bi bi-cart3 icon-preto" style="font-size:1.5rem;"></i>
           <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge-count">{{ cartCount }}</span>
         </button>
@@ -61,6 +61,9 @@
                 <router-link class="dropdown-item profile-dropdown-item" to="/moderador"><i class="bi bi-speedometer2 me-2"></i> Painel Moderador</router-link>
               </li>
               <li><router-link class="dropdown-item profile-dropdown-item" to="/perfil"><i class="bi bi-person-lines-fill me-2"></i> Meu Perfil</router-link></li>
+              <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" @click.prevent="goToPerfil">
+                <i class="bi bi-box-seam"></i> Pedidos
+              </a></li>
               <li><button class="dropdown-item profile-dropdown-item no-hover" @click="logout"><i class="bi bi-box-arrow-right me-2"></i> Sair</button></li>
             </ul>
           </div>
@@ -114,6 +117,10 @@ const cartCount = computed(() => {
 function logout() {
   auth.logout()
   router.push('/login')
+}
+
+function goToPerfil() {
+  router.push({ path: '/perfil', hash: '#pedidos' })
 }
 
 const isDark = ref(localStorage.getItem('theme') === 'dark')
@@ -327,6 +334,20 @@ onMounted(() => {
   background: #FFD600 !important;
   color: #18181b !important;
   border-color: #FFD600 !important;
+}
+.btn-outline-preto {
+  border: 2px solid #18181b;
+  color: #18181b !important;
+  background: #fff;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-outline-preto:hover, .btn-outline-preto:focus {
+  background: #fff !important;
+  color: #18181b !important;
+  border-color: #18181b !important;
+}
+.icon-preto {
+  color: #18181b !important;
 }
 /* Badge de contagem do carrinho */
 .cart-badge-count {

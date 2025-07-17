@@ -10,9 +10,9 @@
               <span :class="{active: etapa === 3}">3. Revisão</span>
             </div>
             <div class="text-center mb-4">
-              <i class="bi bi-shield-lock-fill fs-2 icon-amarelo"></i>
-              <div class="fw-bold text-amarelo mt-2">Pagamento 100% seguro</div>
-              <div class="text-muted small text-preto">Ambiente criptografado. Seus dados estão protegidos.</div>
+              <i class="bi bi-shield-lock-fill fs-2 text-neutral"></i>
+              <div class="fw-bold text-neutral mt-2">Pagamento 100% seguro</div>
+              <div class="text-muted small">Ambiente criptografado. Seus dados estão protegidos.</div>
             </div>
             <div v-if="etapa === 1">
               <h4 class="mb-2 text-center">Endereço de entrega</h4>
@@ -298,19 +298,23 @@ function getImage(path) {
 }
 .steps {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
+  justify-content: center;
+  gap: 1.2rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 1.2rem;
 }
 .steps span {
-  font-weight: 600;
-  color: #bbb;
-  padding: 0.5rem 1.2rem;
+  padding: 0.3rem 1.1rem;
   border-radius: 2rem;
-  background: #f0f0f0;
-  transition: all 0.2s;
+  background: #f5f5f5;
+  color: #888;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
 }
-.steps .active {
-  background: #21ba45;
+.steps span.active {
+  background: #222;
   color: #fff;
 }
 .checkout-summary {
@@ -323,6 +327,36 @@ function getImage(path) {
   object-fit: cover;
   border-radius: 1rem;
   background: #f5f5f5;
+}
+.btn,
+.btn-secondary,
+.btn-outline-secondary {
+  background: #fff !important;
+  color: #18181b !important;
+  border: 2px solid #18181b !important;
+  font-weight: 700;
+  border-radius: 2rem;
+  box-shadow: none;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.btn:hover,
+.btn:focus,
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background: #fff !important;
+  color: #18181b !important;
+  border: 2px solid #18181b !important;
+}
+.btn:disabled,
+.btn[disabled],
+.btn-secondary:disabled,
+.btn-outline-secondary:disabled {
+  background: #f5f5f5 !important;
+  color: #bbb !important;
+  border: 2px solid #eee !important;
+  cursor: not-allowed;
 }
 .btn-lg {
   font-size: 1.15rem;
@@ -345,5 +379,13 @@ function getImage(path) {
   border-color: var(--color-secondary-light);
   color: var(--cor-preto);
   box-shadow: 0 2px 8px 0 rgba(251, 191, 36, 0.10); /* sombra amarela suave */
+}
+.text-neutral {
+  color: #222 !important;
+}
+.icon-amarelo, .text-amarelo, .text-success, .bg-success, .alert-success, .alert-secondary, .alert-info, .alert-light, .bg-amarelo {
+  color: #888 !important;
+  background: #f5f5f5 !important;
+  border: none !important;
 }
 </style> 

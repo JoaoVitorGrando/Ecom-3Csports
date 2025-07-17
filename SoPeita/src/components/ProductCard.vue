@@ -7,7 +7,7 @@
     <span v-if="product.oficial" class="badge bg-success position-absolute top-0 end-0 m-3 fs-6 py-2 px-3 rounded-pill shadow">Oficial</span>
     <!-- Ícone de detalhes -->
     <button class="btn-detalhes-icon position-absolute top-0 end-0 m-3" @click.stop="goToDetails" title="Ver detalhes">
-      <i class="bi bi-search fs-5"></i>
+      <i class="bi bi-search fs-5 icon-preto"></i>
     </button>
     <!-- Tags discretas -->
     <div v-if="productTags.length" class="position-absolute end-0 bottom-0 m-2 d-flex flex-column align-items-end gap-1" style="z-index:2;">
@@ -17,8 +17,8 @@
       <h5 class="card-title fw-bold text-center mb-2">{{ product.name }}</h5>
       <p class="card-text text-success fw-semibold mb-3 fs-4">R$ {{ Number(product.price).toFixed(2) }}</p>
       <div class="d-flex w-100 gap-2 mt-auto">
-        <button v-if="showCartBtn" @click.stop="$emit('add-to-cart', product)" class="btn btn-outline-warning flex-grow-1 fw-bold rounded-pill shadow" title="Adicionar ao carrinho">
-          <i class="bi bi-cart-plus fs-5"></i>
+        <button v-if="showCartBtn" @click.stop="$emit('add-to-cart', product)" class="btn btn-outline-preto flex-grow-1 fw-bold rounded-pill shadow" title="Adicionar ao carrinho">
+          <i class="bi bi-cart-plus fs-5 icon-preto"></i>
         </button>
       </div>
     </div>
@@ -123,9 +123,23 @@ function goToDetails() {
   box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   margin-bottom: 2px;
 }
+.btn-outline-preto {
+  border: 2px solid #18181b;
+  color: #18181b !important;
+  background: transparent;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-outline-preto:hover, .btn-outline-preto:focus {
+  background: #fff !important;
+  color: #18181b !important;
+  border-color: #18181b !important;
+}
+.icon-preto {
+  color: #18181b !important;
+}
 .btn-detalhes-icon {
   background: #fff;
-  border: 1.5px solid #FFD600;
+  border: 1.5px solid #18181b;
   color: #18181b;
   border-radius: 50%;
   width: 38px;
@@ -140,7 +154,7 @@ function goToDetails() {
   padding: 0;
 }
 .btn-detalhes-icon:hover {
-  background: #FFD600;
+  background: #fff;
   color: #18181b;
   border-color: #18181b;
 }

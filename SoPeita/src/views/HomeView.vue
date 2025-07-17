@@ -28,7 +28,7 @@
         </div>
       </section>
       <!-- Carrossel de clubes -->
-      <ClubesCarousel :clubes="clubes" />
+      <ClubesCarousel />
       <!-- Banner promocional extra 2 -->
       <div class="banner-extra mb-5 d-flex align-items-center justify-content-center">
         <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Promoção 2" class="banner-img rounded-4 shadow" style="max-width:100%;height:180px;object-fit:cover;" />

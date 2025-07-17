@@ -42,9 +42,9 @@ export const useCartStore = defineStore('cart', {
         this.loading = false
       }
     },
-    async addItem(product, quantity = 1) {
+    async addItem(product, quantity = 1, size = 'M') {
       await this.ensureCart()
-      return await addItems({ product_id: product.id, quantity, unit_price: Number(product.price) })
+      return await addItems({ product_id: product.id, quantity, unit_price: Number(product.price), size })
     },
     async updateItem(product_id, quantity) {
       await this.ensureCart()
