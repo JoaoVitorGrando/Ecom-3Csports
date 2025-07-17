@@ -1,25 +1,25 @@
 <template>
   <div class="perfil-pedidos-wrapper">
     <div class="perfil-card-area">
-      <div class="perfil-card">
-        <h2 class="perfil-title">Meu Perfil</h2>
+    <div class="perfil-card">
+      <h2 class="perfil-title">Meu Perfil</h2>
         <div class="perfil-subtitle">Editar perfil:</div>
-        <form @submit.prevent="salvar">
-          <div class="mb-3">
-            <label class="form-label">Nome</label>
-            <input v-model="nome" type="text" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">E-mail</label>
-            <input v-model="email" type="email" class="form-control" required />
-          </div>
-          <div class="mb-3">
+      <form @submit.prevent="salvar">
+        <div class="mb-3">
+          <label class="form-label">Nome</label>
+          <input v-model="nome" type="text" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">E-mail</label>
+          <input v-model="email" type="email" class="form-control" required />
+        </div>
+        <div class="mb-3">
             <label class="form-label">Nova senha <span class="form-label-optional">(opcional)</span></label>
             <input v-model="senha" type="password" class="form-control" placeholder="Deixe em branco para não alterar" autocomplete="new-password" />
-          </div>
-          <button type="submit" class="btn-perfil">Salvar alterações</button>
-          <div v-if="sucesso" class="perfil-success mt-3">Dados atualizados com sucesso!</div>
-        </form>
+        </div>
+        <button type="submit" class="btn-perfil">Salvar alterações</button>
+        <div v-if="sucesso" class="perfil-success mt-3">Dados atualizados com sucesso!</div>
+      </form>
       </div>
     </div>
     <div class="pedidos-card-area">
