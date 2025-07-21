@@ -15,9 +15,6 @@
         <button class="nav-link sidebar-btn" :class="{active: tab==='pedidos'}" @click="tab='pedidos'">
           <i class="bi bi-bag-check me-2"></i> Pedidos
         </button>
-        <button class="nav-link sidebar-btn" :class="{active: tab==='tags'}" @click="tab='tags'">
-          <i class="bi bi-tag me-2"></i> Tags
-        </button>
       </nav>
     </aside>
     <!-- Main -->
@@ -172,15 +169,6 @@
                     <label class="form-label mb-1 text-secondary">Imagem</label>
                     <input type="file" accept="image/*" class="form-control bg-light border-0 rounded-3 form-control-lg" @change="handleImageChange" :required="!produtoEditando.id" />
                   </div>
-                  <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">Tags</label>
-                    <div class="d-flex flex-wrap gap-2">
-                      <label v-for="tag in tagsStore.tags" :key="tag.id" class="form-check-label d-flex align-items-center gap-1" style="cursor:pointer;">
-                        <input type="checkbox" class="form-check-input" v-model="tagsSelecionadas" :value="tag.id" />
-                        <span :style="{background: tag.color_hex, color: '#222', padding: '2px 10px', borderRadius: '8px', fontSize: '0.9em'}">{{ tag.code }}</span>
-                      </label>
-                    </div>
-                  </div>
                 </div>
                 <div class="modal-footer border-0 pb-4 px-0 pt-0 d-flex justify-content-between" style="padding-left:0; padding-right:0;">
                   <button type="button" class="btn btn-light border px-4 py-2 rounded-3" @click="closeProdutoModal">Cancelar</button>
@@ -229,41 +217,6 @@
           </div>
         </div>
       </section>
-      <!-- Tags -->
-      <section v-else-if="tab==='tags'" class="admin-section mt-4">
-        <h3 class="mb-3">Gerenciar Tags</h3>
-        <form @submit.prevent="salvarTag" class="d-flex gap-2 mb-3 align-items-center">
-          <input v-model="novaTag.code" class="form-control" placeholder="Código" required style="max-width:120px" />
-          <div class="d-flex align-items-center gap-1">
-            <input v-model="novaTag.color_hex" class="form-control" placeholder="#HEX cor" required style="max-width:120px" />
-            <span v-for="cor in coresPredefinidas" :key="cor" @click="novaTag.color_hex = cor" :style="{background: cor, border: novaTag.color_hex === cor ? '2px solid #18181b' : '1px solid #ccc', width: '28px', height: '28px', borderRadius: '8px', cursor: 'pointer', display: 'inline-block', marginLeft: '4px'}"></span>
-          </div>
-          <input v-model="novaTag.description" class="form-control" placeholder="Descrição" required style="max-width:220px" />
-          <button class="btn btn-secondary" type="submit">{{ editandoTag ? 'Salvar' : 'Adicionar' }}</button>
-          <button v-if="editandoTag" class="btn btn-outline-secondary" type="button" @click="() => { editandoTag = null; novaTag = { code: '', color_hex: '', description: '' } }">Cancelar</button>
-        </form>
-        <table class="table table-bordered table-sm">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Cor</th>
-              <th>Descrição</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tag in tagsStore.tags" :key="tag.id">
-              <td>{{ tag.code }}</td>
-              <td><span :style="{background: tag.color_hex, color: '#222', padding: '2px 10px', borderRadius: '8px'}">{{ tag.color_hex }}</span></td>
-              <td>{{ tag.description }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary me-1" @click="editarTag(tag)">Editar</button>
-                <button class="btn btn-sm btn-outline-danger" @click="removerTag(tag.id)">Remover</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
     </main>
   </div>
 </template>
@@ -273,7 +226,6 @@ import { ref, computed, onMounted, watchEffect } from 'vue'
 import { useProductsStore } from '@/stores/products'
 import { useAuthStore } from '@/stores/auth'
 import { useOrdersStore } from '@/stores/orders'
-import { useTagsStore } from '@/stores/tags'
 import { showToast } from '@/utils/toast'
 import { getCategories } from '@/services/HttpService'
 
@@ -281,7 +233,6 @@ const tab = ref('dashboard')
 const productsStore = useProductsStore()
 const authStore = useAuthStore()
 const ordersStore = useOrdersStore()
-const tagsStore = useTagsStore()
 
 const produtos = computed(() => productsStore.products)
 const produtosLoading = computed(() => productsStore.loading)
@@ -300,10 +251,11 @@ async function fetchCategorias() {
   }
 }
 onMounted(() => {
-  productsStore.fetchProducts()
-  ordersStore.fetchOrders()
+  if (authStore.user?.id) {
+    productsStore.fetchProductsByUser(authStore.user.id)
+    ordersStore.fetchAllOrdersByAdmin(authStore.user.id)
+  }
   fetchCategorias()
-  tagsStore.fetchTags()
 })
 
 // Produtos
@@ -343,19 +295,6 @@ async function salvarProduto() {
     }
     closeProdutoModal()
     productsStore.fetchProducts()
-    // Após criar/editar produto, associar tags
-    if (produtoEditando.value.id) {
-      for (const tag of tagsStore.tags) {
-        if ((tag.products || []).some(p => p.id === produtoEditando.value.id) && !tagsSelecionadas.value.includes(tag.id)) {
-          await tagsStore.removeProductFromTag(tag.id, produtoEditando.value.id)
-        }
-      }
-      for (const tagId of tagsSelecionadas.value) {
-        if (!(tagsStore.tags.find(t => t.id === tagId).products || []).some(p => p.id === produtoEditando.value.id)) {
-          await tagsStore.addProductToTag(tagId, produtoEditando.value.id)
-        }
-      }
-    }
   } catch (e) {
     produtoError.value = e?.response?.data?.detail || e?.message || 'Erro ao salvar produto.'
     showToast(produtoError.value, 'error')
@@ -393,43 +332,6 @@ function getActiveDiscount(produto) {
 // Pedidos
 function verPedido(pedido) { showToast('Função de visualizar pedido não implementada', 'info') }
 function alterarStatusPedido(pedido) { showToast('Função de alterar status não implementada', 'info') }
-
-const novaTag = ref({ code: '', color_hex: '', description: '' })
-const editandoTag = ref(null)
-const coresPredefinidas = ['#4ADE80', '#FFD600', '#EF4444'] // verde, amarelo, vermelho
-// Seleção de tags no modal de produto
-const tagsSelecionadas = ref([])
-watchEffect(() => {
-  if (showProdutoModal.value && produtoEditando.value.id) {
-    tagsSelecionadas.value = tagsStore.tags.filter(tag => (tag.products || []).some(p => p.id === produtoEditando.value.id)).map(tag => tag.id)
-  } else if (showProdutoModal.value) {
-    tagsSelecionadas.value = []
-  }
-})
-
-function salvarTag() {
-  if (editandoTag.value) {
-    tagsStore.updateTag(editandoTag.value.id, { ...novaTag.value }).then(() => {
-      tagsStore.fetchTags()
-      editandoTag.value = null
-      novaTag.value = { code: '', color_hex: '', description: '' }
-    })
-  } else {
-    tagsStore.createTag({ ...novaTag.value }).then(() => {
-      tagsStore.fetchTags()
-      novaTag.value = { code: '', color_hex: '', description: '' }
-    })
-  }
-}
-function editarTag(tag) {
-  editandoTag.value = tag
-  novaTag.value = { code: tag.code, color_hex: tag.color_hex, description: tag.description }
-}
-function removerTag(id) {
-  if (confirm('Tem certeza que deseja remover esta tag?')) {
-    tagsStore.deleteTag(id).then(() => tagsStore.fetchTags())
-  }
-}
 </script>
 
 <style scoped>

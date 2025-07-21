@@ -25,9 +25,6 @@
         <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='categorias'}" @click="tab='categorias'">
           <i class="bi bi-tags me-2"></i> Categorias
         </button>
-        <button v-if="userRole==='ADMIN' || userRole==='MODERATOR'" class="nav-link sidebar-btn" :class="{active: tab==='tags'}" @click="tab='tags'">
-          <i class="bi bi-tag me-2"></i> Tags
-        </button>
       </nav>
     </aside>
     <!-- Main -->
@@ -107,10 +104,9 @@
             <table class="table align-middle mb-0">
               <thead class="table-success">
                 <tr>
-                  <th class="ps-4">Imagem</th>
+                  <th class="ps-4 text-center">Imagem</th>
                   <th>Nome</th>
                   <th>Preço</th>
-                  <th>Desconto</th>
                   <th>Estoque</th>
                   <th>Categoria</th>
                   <th class="d-none d-md-table-cell">Descrição</th>
@@ -119,29 +115,35 @@
               </thead>
               <tbody>
                 <tr v-if="produtosLoading">
-                  <td colspan="8" class="text-center py-4">Carregando produtos...</td>
+                  <td colspan="7" class="text-center py-4">Carregando produtos...</td>
                 </tr>
                 <tr v-else-if="produtosError">
-                  <td colspan="8" class="alert alert-danger text-center">{{ produtosError }}</td>
+                  <td colspan="7" class="alert alert-danger text-center">{{ produtosError }}</td>
                 </tr>
                 <tr v-else-if="!produtos.length">
-                  <td colspan="8" class="text-center text-muted py-4">Nenhum produto cadastrado ainda.</td>
+                  <td colspan="7" class="text-center text-muted py-4">Nenhum produto cadastrado ainda.</td>
                 </tr>
                 <tr v-else v-for="produto in produtos" :key="produto.id">
-                  <td class="ps-4">
-                    <img :src="getImage(produto.image_path)" alt="img" style="width:48px;height:48px;object-fit:cover;border-radius:12px;background:#f5f5f5;">
+                  <td class="ps-4 text-center align-middle">
+                    <img :src="getImage(produto.image_path)" alt="img" style="width:64px;height:64px;object-fit:cover;border-radius:14px;background:#f5f5f5;box-shadow:0 2px 8px rgba(24,24,27,0.07);">
                   </td>
-                  <td class="fw-semibold">{{ produto.name }}</td>
-                  <td>R$ {{ Number(produto.price).toFixed(2) }}</td>
-                  <td>
-                    <span v-if="getActiveDiscount(produto)" class="badge bg-danger bg-opacity-10 text-danger fs-6">
-                      -{{ Number(getActiveDiscount(produto).discount_percentage).toFixed(0) }}%
+                  <td class="align-middle">
+                    <div class="fw-bold fs-6 mb-1">{{ produto.name }}</div>
+                    <div v-if="getActiveDiscount(produto)" class="badge badge-desconto-admin mt-1">-{{ Number(getActiveDiscount(produto).discount_percentage).toFixed(0) }}% OFF</div>
+                  </td>
+                  <td class="align-middle">
+                    <span class="fs-5 fw-bold text-success">R$ {{ Number(produto.price).toFixed(2) }}</span>
+                  </td>
+                  <td class="align-middle">
+                    <span :class="['badge', produto.stock > 10 ? 'bg-success' : produto.stock > 0 ? 'bg-warning text-dark' : 'bg-danger']">
+                      {{ produto.stock > 0 ? produto.stock : 'Esgotado' }}
                     </span>
                   </td>
-                  <td>{{ produto.stock }}</td>
-                  <td>{{ produto.category?.name || '-' }}</td>
-                  <td class="d-none d-md-table-cell text-truncate" style="max-width:220px;">{{ produto.description }}</td>
-                  <td class="text-end pe-4">
+                  <td class="align-middle">{{ produto.category?.name || '-' }}</td>
+                  <td class="d-none d-md-table-cell align-middle">
+                    <span :title="produto.description" style="max-width:220px;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ produto.description }}</span>
+                  </td>
+                  <td class="text-end pe-4 align-middle">
                     <button class="btn btn-outline-primary btn-sm me-2" @click="openProdutoModal(produto)" title="Editar"><i class="bi bi-pencil-square"></i></button>
                     <button class="btn btn-outline-danger btn-sm" @click="confirmDeleteProduto(produto)" title="Remover"><i class="bi bi-trash"></i></button>
                   </td>
@@ -188,13 +190,27 @@
                     <label class="form-label mb-1 text-secondary">Imagem</label>
                     <input type="file" accept="image/*" class="form-control bg-light border-0 rounded-3 form-control-lg" @change="handleImageChange" :required="!produtoEditando.id" />
                   </div>
+                </div>
+                <!-- Dentro do modal de produto, antes do footer -->
                   <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">Tags</label>
-                    <div class="d-flex flex-wrap gap-2">
-                      <label v-for="tag in tagsStore.tags" :key="tag.id" class="form-check-label d-flex align-items-center gap-1" style="cursor:pointer;">
-                        <input type="checkbox" class="form-check-input" v-model="tagsSelecionadas" :value="tag.id" />
-                        <span :style="{background: tag.color_hex, color: '#222', padding: '2px 10px', borderRadius: '8px', fontSize: '0.9em'}">{{ tag.code }}</span>
-                      </label>
+                  <label class="form-label mb-1 text-secondary">Desconto</label>
+                  <div v-if="!criandoDesconto">
+                    <select v-model="descontoSelecionado" class="form-select bg-light border-0 rounded-3 form-control-lg">
+                      <option value="" disabled>Selecione um desconto...</option>
+                      <option v-for="desc in descontos.filter(d => !d.product_id || d.product_id === produtoEditando.id)" :key="desc.id" :value="desc.id">
+                        {{ desc.description }} - {{ desc.discount_percentage }}% ({{ desc.start_date.slice(0,10) }} a {{ desc.end_date.slice(0,10) }})
+                      </option>
+                    </select>
+                    <button class="btn btn-link px-0 mt-2" @click="abrirCriarDesconto">+ Criar novo desconto</button>
+                  </div>
+                  <div v-else>
+                    <input v-model="novoDesconto.description" class="form-control mb-2" placeholder="Descrição do desconto" />
+                    <input v-model.number="novoDesconto.discount_percentage" type="number" min="1" max="100" class="form-control mb-2" placeholder="% de desconto" />
+                    <input v-model="novoDesconto.start_date" type="date" class="form-control mb-2" placeholder="Início" />
+                    <input v-model="novoDesconto.end_date" type="date" class="form-control mb-2" placeholder="Fim" />
+                    <div class="d-flex gap-2 mt-2">
+                      <button class="btn btn-success btn-sm" @click="salvarNovoDesconto">Salvar</button>
+                      <button class="btn btn-light btn-sm" @click="cancelarCriarDesconto">Cancelar</button>
                     </div>
                   </div>
                 </div>
@@ -321,13 +337,18 @@
               <tbody>
                 <tr v-for="pedido in pedidos" :key="pedido.id">
                   <td>{{ pedido.id }}</td>
-                  <td>{{ pedido.cliente }}</td>
+                  <td>{{ pedido.client_name || pedido.client_email || '-' }}</td>
                   <td><span class="badge" :class="pedido.status === 'ENTREGUE' ? 'bg-success' : 'bg-warning'">{{ pedido.status }}</span></td>
-                  <td>R$ {{ Number(pedido.valor).toFixed(2) }}</td>
-                  <td>{{ pedido.data }}</td>
                   <td>
-                    <button class="btn btn-outline-primary btn-sm" @click="verPedido(pedido)"><i class="bi bi-eye"></i></button>
-                    <button class="btn btn-outline-success btn-sm" @click="alterarStatusPedido(pedido)"><i class="bi bi-arrow-repeat"></i></button>
+                    R$ {{
+                      pedido.products
+                        ? calcularTotalPedido(pedido)
+                        : (isNaN(Number(pedido.total)) ? '0.00' : Number(pedido.total).toFixed(2))
+                    }}
+                  </td>
+                  <td>{{ formatDate(pedido.created_at) }}</td>
+                  <td>
+                    <button class="btn btn-outline-primary btn-sm" @click="abrirDetalhesPedido(pedido)"><i class="bi bi-eye"></i></button>
                   </td>
                 </tr>
               </tbody>
@@ -510,42 +531,96 @@
           </div>
         </div>
       </section>
-      <!-- Tags -->
-      <section v-else-if="tab==='tags'" class="admin-section mt-4">
-        <h3 class="mb-3">Gerenciar Tags</h3>
-        <form @submit.prevent="salvarTag" class="d-flex gap-2 mb-3 align-items-center">
-          <input v-model="novaTag.code" class="form-control" placeholder="Código" required style="max-width:120px" />
-          <div class="d-flex align-items-center gap-1">
-            <input v-model="novaTag.color_hex" class="form-control" placeholder="#HEX cor" required style="max-width:120px" />
-            <span v-for="cor in coresPredefinidas" :key="cor" @click="novaTag.color_hex = cor" :style="{background: cor, border: novaTag.color_hex === cor ? '2px solid #18181b' : '1px solid #ccc', width: '28px', height: '28px', borderRadius: '8px', cursor: 'pointer', display: 'inline-block', marginLeft: '4px'}"></span>
+    </main>
           </div>
-          <input v-model="novaTag.description" class="form-control" placeholder="Descrição" required style="max-width:220px" />
-          <button class="btn btn-secondary" type="submit">{{ editandoTag ? 'Salvar' : 'Adicionar' }}</button>
-          <button v-if="editandoTag" class="btn btn-outline-secondary" type="button" @click="() => { editandoTag = null; novaTag = { code: '', color_hex: '', description: '' } }">Cancelar</button>
-        </form>
-        <table class="table table-bordered table-sm">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Cor</th>
-              <th>Descrição</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+  <!-- Modal de detalhes do pedido -->
+  <div v-if="pedidoSelecionado" class="pedido-detalhes-modal">
+    <div class="pedido-detalhes-card">
+      <div class="pedido-detalhes-header d-flex justify-content-between align-items-center mb-3 pb-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-receipt-cutoff fs-3 text-amarelo"></i>
+          <h5 class="mb-0">Pedido <span class="text-amarelo">#{{ pedidoSelecionado.id }}</span></h5>
+        </div>
+        <button class="btn-close btn-close-lg" @click="fecharDetalhesPedido()"></button>
+      </div>
+      <div class="pedido-detalhes-menu mb-3 d-flex gap-2 justify-content-center">
+        <button :class="['pedido-detalhes-tab', abaPedido==='resumo' ? 'ativo' : '']" @click="abaPedido='resumo'">
+          <i class="bi bi-clipboard-data me-1"></i> Resumo
+        </button>
+        <button :class="['pedido-detalhes-tab', abaPedido==='produtos' ? 'ativo' : '']" @click="abaPedido='produtos'">
+          <i class="bi bi-box-seam me-1"></i> Produtos
+        </button>
+        <button :class="['pedido-detalhes-tab', abaPedido==='cliente' ? 'ativo' : '']" @click="abaPedido='cliente'">
+          <i class="bi bi-person-circle me-1"></i> Cliente
+        </button>
+        <button :class="['pedido-detalhes-tab', abaPedido==='endereco' ? 'ativo' : '']" @click="abaPedido='endereco'">
+          <i class="bi bi-geo-alt me-1"></i> Entrega
+        </button>
+      </div>
+      <div v-if="abaPedido==='resumo'" class="pedido-resumo-admin mb-2">
+        <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
+          <span class="badge fs-6 px-3 py-2" :class="pedidoSelecionado.status === 'ENTREGUE' ? 'bg-success' : 'bg-warning text-dark'">{{ pedidoSelecionado.status }}</span>
+          <span class="text-muted small"><i class="bi bi-calendar-event me-1"></i>{{ formatDate(pedidoSelecionado.created_at) }}</span>
+          <span class="text-muted small"><i class="bi bi-hash me-1"></i>ID: {{ pedidoSelecionado.id }}</span>
+        </div>
+        <div class="d-flex flex-column gap-1 mt-2 mb-2">
+          <div class="mb-2">
+            <label class="form-label mb-1">Status do Pedido</label>
+            <div class="d-flex gap-2 align-items-center">
+              <select v-model="novoStatus" class="form-select form-select-sm w-auto">
+                <option value="PENDING">Pendente</option>
+                <option value="PROCESSING">Processando</option>
+                <option value="SHIPPED">Enviado</option>
+                <option value="DELIVERED">Entregue</option>
+                <option value="CANCELLED">Cancelado</option>
+              </select>
+              <button class="btn btn-sm btn-success" @click="salvarStatusPedido" :disabled="novoStatus===pedidoSelecionado.status || statusLoading">
+                <span v-if="statusLoading" class="spinner-border spinner-border-sm me-1"></span>
+                Salvar
+              </button>
+            </div>
+            <div v-if="statusMsg" :class="['mt-1', statusMsgTipo==='success' ? 'text-success' : 'text-danger']">{{ statusMsg }}</div>
+          </div>
+          <div><b>Cupom:</b> <span v-if="pedidoSelecionado.coupon_id && cupons.value && cupons.value.length">-{{ getCupomDesconto(pedidoSelecionado) }}%</span><span v-else>-</span></div>
+          <div><b>Subtotal:</b> <span class="text-secondary">R$ {{ pedidoSelecionado.products ? pedidoSelecionado.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0).toFixed(2) : '0.00' }}</span></div>
+          <div v-if="pedidoSelecionado.coupon_id && cupons.value && cupons.value.length"><b>Desconto:</b> <span class="text-success">-R$ {{ (pedidoSelecionado.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0) * (getCupomDesconto(pedidoSelecionado)/100)).toFixed(2) }}</span></div>
+          <div class="fs-5 mt-2"><b>Total:</b> <span class="text-success">R$ {{ calcularTotalPedido(pedidoSelecionado) }}</span></div>
+        </div>
+      </div>
+      <div v-else-if="abaPedido==='produtos'">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light"><tr><th>Produto</th><th>Qtd</th><th>Tam.</th><th>Unitário</th><th>Total</th></tr></thead>
           <tbody>
-            <tr v-for="tag in tagsStore.tags" :key="tag.id">
-              <td>{{ tag.code }}</td>
-              <td><span :style="{background: tag.color_hex, color: '#222', padding: '2px 10px', borderRadius: '8px'}">{{ tag.color_hex }}</span></td>
-              <td>{{ tag.description }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary me-1" @click="editarTag(tag)">Editar</button>
-                <button class="btn btn-sm btn-outline-danger" @click="removerTag(tag.id)">Remover</button>
+            <tr v-for="item in pedidoSelecionado.products" :key="item.id || item.name">
+              <td class="d-flex align-items-center gap-2">
+                <img :src="getImage(item.image || item.image_path)" class="pedido-product-img-novo me-2" alt="Produto" />
+                <span>{{ item.name }}</span>
               </td>
+              <td>{{ item.quantity || 1 }}</td>
+              <td>{{ item.size || '-' }}</td>
+              <td>R$ {{ Number(item.price).toFixed(2) }}</td>
+              <td>R$ {{ (Number(item.price) * (item.quantity || 1)).toFixed(2) }}</td>
             </tr>
           </tbody>
         </table>
-      </section>
-    </main>
+      </div>
+      <div v-else-if="abaPedido==='cliente'" class="pedido-cliente-admin mt-2">
+        <div class="d-flex align-items-center gap-2 mb-2"><i class="bi bi-person-circle fs-4 text-amarelo"></i><b>Nome:</b> <span>{{ pedidoSelecionado.client_name || '-' }}</span></div>
+        <div class="d-flex align-items-center gap-2 mb-2"><i class="bi bi-envelope fs-5 text-amarelo"></i><b>Email:</b> <span>{{ pedidoSelecionado.client_email || '-' }}</span></div>
+        <div class="d-flex align-items-center gap-2 mb-2"><i class="bi bi-telephone fs-5 text-amarelo"></i><b>Telefone:</b> <span>{{ pedidoSelecionado.client_phone || '-' }}</span></div>
+      </div>
+      <div v-else-if="abaPedido==='endereco'" class="pedido-endereco-admin mt-2">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-geo-alt-fill fs-3 text-amarelo"></i>
+          <span class="fs-5 fw-bold">Local de Entrega</span>
+        </div>
+        <div class="mb-2"><b>Endereço:</b> {{ pedidoSelecionado.address?.street || '-' }}, {{ pedidoSelecionado.address?.number || '' }}</div>
+        <div class="mb-2"><b>Bairro:</b> {{ pedidoSelecionado.address?.neighborhood || '-' }}</div>
+        <div class="mb-2"><b>Cidade:</b> {{ pedidoSelecionado.address?.city || '-' }} - {{ pedidoSelecionado.address?.state || '-' }}</div>
+        <div class="mb-2"><b>CEP:</b> {{ pedidoSelecionado.address?.zip_code || '-' }}</div>
+        <div class="mb-2"><b>Complemento:</b> {{ pedidoSelecionado.address?.complement || '-' }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -556,10 +631,10 @@ import { useAuthStore } from '@/stores/auth'
 import { useOrdersStore } from '@/stores/orders'
 import { useCouponsStore } from '@/stores/coupons'
 import { useAddressesStore } from '@/stores/addresses'
-import { useTagsStore } from '@/stores/tags'
 import { getCategories, registerCategories, updateCategories, deleteCategorie } from '@/services/HttpService'
 import { showToast } from '@/utils/toast'
-import { register, registerModerator, changeUserInfos, deleteUser, getUser } from '@/services/HttpService'
+import { register, registerModerator, changeUserInfos, deleteUser, getUser, getDiscounts, createDiscount, updateDiscount, deleteDiscount } from '@/services/HttpService'
+import { changeOrderStatus } from '@/services/HttpService'
 const usuarios = ref([])
 const usuariosLoading = ref(false)
 const usuariosError = ref('')
@@ -614,15 +689,12 @@ const authStore = useAuthStore()
 const ordersStore = useOrdersStore()
 const couponsStore = useCouponsStore()
 const addressesStore = useAddressesStore()
-const tagsStore = useTagsStore()
-
+const categorias = ref([])
 const produtos = computed(() => productsStore.products)
 const produtosLoading = computed(() => productsStore.loading)
 const produtosError = computed(() => productsStore.error)
-
 const pedidos = computed(() => ordersStore.orders)
 const cupons = computed(() => couponsStore.coupons)
-const categorias = ref([])
 const totalVendas = computed(() => pedidos.value.reduce((acc, p) => acc + (p.valor || 0), 0))
 const adminName = computed(() => authStore.user?.name || authStore.user?.email || 'Administrador')
 const auth = useAuthStore()
@@ -646,11 +718,12 @@ function formatDate(date) {
 }
 
 onMounted(() => {
-  productsStore.fetchProducts()
-  ordersStore.fetchOrders()
-  couponsStore.fetchCoupons() // Garante que sempre busca cupons ao montar
+  if (authStore.user?.id) {
+    productsStore.fetchProductsByUser(authStore.user.id)
+    ordersStore.fetchAllOrdersByAdmin(authStore.user.id)
+  }
+  couponsStore.fetchCoupons()
   fetchCategorias()
-  tagsStore.fetchTags()
 })
 
 // Produtos
@@ -689,21 +762,6 @@ async function salvarProduto() {
     }
     closeProdutoModal()
     productsStore.fetchProducts()
-    // Após criar/editar produto, associar tags
-    if (produtoEditando.value.id) {
-      // Remover todas as tags antigas
-      for (const tag of tagsStore.tags) {
-        if ((tag.products || []).some(p => p.id === produtoEditando.value.id) && !tagsSelecionadas.value.includes(tag.id)) {
-          await tagsStore.removeProductFromTag(tag.id, produtoEditando.value.id)
-        }
-      }
-      // Adicionar as novas
-      for (const tagId of tagsSelecionadas.value) {
-        if (!(tagsStore.tags.find(t => t.id === tagId).products || []).some(p => p.id === produtoEditando.value.id)) {
-          await tagsStore.addProductToTag(tagId, produtoEditando.value.id)
-        }
-      }
-    }
   } catch (e) {
     produtoError.value = e?.response?.data?.detail || e?.message || 'Erro ao salvar produto.'
     showToast(produtoError.value, 'error')
@@ -752,6 +810,20 @@ function toggleUserStatus(usuario) { showToast('Função de usuário não implem
 // Pedidos
 function verPedido(pedido) { showToast('Função de visualizar pedido não implementada', 'info') }
 function alterarStatusPedido(pedido) { showToast('Função de alterar status não implementada', 'info') }
+
+function calcularTotalPedido(pedido) {
+  const subtotal = pedido.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0)
+  if (pedido.coupon && pedido.coupon.discount_percentage) {
+    return (subtotal * (1 - (pedido.coupon.discount_percentage / 100))).toFixed(2)
+  }
+  if (pedido.coupon_id && cupons.value && cupons.value.length) {
+    const cupom = cupons.value.find(c => c.id === pedido.coupon_id)
+    if (cupom && cupom.discount_percentage) {
+      return (subtotal * (1 - (cupom.discount_percentage / 100))).toFixed(2)
+    }
+  }
+  return subtotal.toFixed(2)
+}
 
 // Cupons
 const showCupomModal = ref(false)
@@ -909,47 +981,33 @@ async function removeUser(usuario) {
   }
 }
 
-// Tags
-const novaTag = ref({ code: '', color_hex: '', description: '' })
-const editandoTag = ref(null)
-const coresPredefinidas = ['#4ADE80', '#FFD600', '#EF4444'] // verde, amarelo, vermelho
+// Descontos
+const descontos = ref([])
+const descontoSelecionado = ref(null)
+const novoDesconto = ref({ description: '', discount_percentage: 0, start_date: '', end_date: '' })
+const criandoDesconto = ref(false)
 
-function salvarTag() {
-  if (editandoTag.value) {
-    tagsStore.updateTag(editandoTag.value.id, { ...novaTag.value }).then(() => {
-      tagsStore.fetchTags()
-      editandoTag.value = null
-      novaTag.value = { code: '', color_hex: '', description: '' }
-    })
-  } else {
-    tagsStore.createTag({ ...novaTag.value }).then(() => {
-      tagsStore.fetchTags()
-      novaTag.value = { code: '', color_hex: '', description: '' }
-    })
-  }
+async function fetchDescontos() {
+  descontos.value = await getDiscounts()
 }
 
-function editarTag(tag) {
-  editandoTag.value = tag
-  novaTag.value = { code: tag.code, color_hex: tag.color_hex, description: tag.description }
+function abrirCriarDesconto() {
+  criandoDesconto.value = true
+  descontoSelecionado.value = null
+  novoDesconto.value = { description: '', discount_percentage: 0, start_date: '', end_date: '' }
 }
-
-function removerTag(id) {
-  if (confirm('Tem certeza que deseja remover esta tag?')) {
-    tagsStore.deleteTag(id).then(() => tagsStore.fetchTags())
-  }
+function cancelarCriarDesconto() {
+  criandoDesconto.value = false
+  descontoSelecionado.value = null
 }
-
-// Seleção de tags no modal de produto
-const tagsSelecionadas = ref([])
-watchEffect(() => {
-  if (showProdutoModal.value && produtoEditando.value.id) {
-    // Ao editar, marcar as tags já associadas
-    tagsSelecionadas.value = tagsStore.tags.filter(tag => (tag.products || []).some(p => p.id === produtoEditando.value.id)).map(tag => tag.id)
-  } else if (showProdutoModal.value) {
-    tagsSelecionadas.value = []
-  }
-})
+async function salvarNovoDesconto() {
+  if (!novoDesconto.value.description || !novoDesconto.value.discount_percentage || !novoDesconto.value.start_date || !novoDesconto.value.end_date) return
+  const payload = { ...novoDesconto.value, product_id: produtoEditando.value.id || null }
+  const desconto = await createDiscount(payload)
+  descontos.value.push(desconto)
+  descontoSelecionado.value = desconto.id
+  criandoDesconto.value = false
+}
 
 // Redirecionar moderador para produtos se tentar acessar aba não permitida
 watch(tab, (newTab) => {
@@ -957,6 +1015,46 @@ watch(tab, (newTab) => {
     tab.value = 'produtos'
   }
 })
+
+const pedidoSelecionado = ref(null)
+const abaPedido = ref('resumo')
+function abrirDetalhesPedido(pedido) {
+  pedidoSelecionado.value = pedido
+  abaPedido.value = 'resumo'
+}
+function fecharDetalhesPedido() {
+  pedidoSelecionado.value = null
+}
+function getCupomDesconto(pedido) {
+  if (!pedido.coupon_id || !cupons.value || !cupons.value.length) return 0
+  const cupom = cupons.value.find(c => c.id === pedido.coupon_id)
+  return cupom ? cupom.discount_percentage : 0
+}
+
+const novoStatus = ref('')
+const statusLoading = ref(false)
+const statusMsg = ref('')
+const statusMsgTipo = ref('success')
+watch(() => pedidoSelecionado.value, (novo) => {
+  if (novo) novoStatus.value = novo.status
+})
+async function salvarStatusPedido() {
+  if (!pedidoSelecionado.value?.id || !novoStatus.value) return
+  statusLoading.value = true
+  statusMsg.value = ''
+  try {
+    await changeOrderStatus(pedidoSelecionado.value.id, { status: novoStatus.value })
+    pedidoSelecionado.value.status = novoStatus.value
+    statusMsg.value = 'Status atualizado com sucesso!'
+    statusMsgTipo.value = 'success'
+    await ordersStore.fetchAllOrdersByAdmin(authStore.user.id)
+  } catch (e) {
+    statusMsg.value = e?.response?.data?.detail || 'Erro ao atualizar status.'
+    statusMsgTipo.value = 'danger'
+  } finally {
+    statusLoading.value = false
+  }
+}
 </script> 
 
 <style scoped>
@@ -1410,5 +1508,97 @@ watch(tab, (newTab) => {
 .table-success {
   background: #fff9c4 !important;
   color: #18181b !important;
+}
+.pedido-detalhes-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pedido-detalhes-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 2.2rem 2.7rem 2.2rem 2.7rem;
+  min-width: 370px;
+  max-width: 98vw;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.16);
+  border: 1.5px solid #ffe082;
+  position: relative;
+}
+.pedido-detalhes-header {
+  border-bottom: 1.5px solid #ffe082;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.7rem;
+}
+.pedido-detalhes-menu {
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+.pedido-detalhes-tab {
+  background: #f5f5f5;
+  border: none;
+  border-radius: 1rem 1rem 0 0;
+  padding: 0.7rem 1.3rem;
+  font-weight: 600;
+  color: #232323;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  font-size: 1.08rem;
+  box-shadow: 0 1px 8px rgba(24,24,27,0.04);
+}
+.pedido-detalhes-tab.ativo, .pedido-detalhes-tab:hover {
+  background: #FFD600;
+  color: #232323;
+  border-color: #FFD600;
+}
+.pedido-resumo-admin {
+  background: #fffde7;
+  border-radius: 1.1rem;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(255,214,0,0.07);
+  border: 1px solid #ffe082;
+}
+.pedido-product-img-novo {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f0f0f0;
+  border: 1px solid #ffe082;
+}
+.pedido-cliente-admin, .pedido-endereco-admin {
+  background: #fffde7;
+  border-radius: 1.1rem;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(255,214,0,0.07);
+  border: 1px solid #ffe082;
+}
+@media (max-width: 700px) {
+  .pedido-detalhes-card {
+    padding: 1.1rem 0.5rem 1.1rem 0.5rem;
+    min-width: 90vw;
+  }
+  .pedido-resumo-admin, .pedido-cliente-admin, .pedido-endereco-admin {
+    padding: 0.7rem 0.5rem;
+  }
+  .pedido-product-img-novo {
+    width: 28px;
+    height: 28px;
+  }
+}
+.table th, .table td {
+  border-right: 1.5px solid #ffe082;
+}
+.table th:last-child, .table td:last-child {
+  border-right: none;
+}
+.badge-desconto-admin {
+  color: #232323 !important;
+  background: #ffd60033 !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 </style> 

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getOrders, getOrderById, newOrder, changeOrderStatus, getClientOrders } from '../services/HttpService'
+import { getOrders, getOrderById, newOrder, changeOrderStatus, getClientOrders, getAllOrders, getAllOrdersByAdmin } from '../services/HttpService'
 
 export const useOrdersStore = defineStore('orders', {
   state: () => ({
@@ -30,6 +30,28 @@ export const useOrdersStore = defineStore('orders', {
     },
     async fetchClientOrders(clientId) {
       return await getClientOrders(clientId)
+    },
+    async fetchAllOrders() {
+      this.loading = true
+      try {
+        this.orders = await getAllOrders()
+        this.error = ''
+      } catch (e) {
+        this.error = e?.response?.data?.detail || 'Erro ao buscar todos os pedidos.'
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchAllOrdersByAdmin(adminId) {
+      this.loading = true
+      try {
+        this.orders = await getAllOrdersByAdmin(adminId)
+        this.error = ''
+      } catch (e) {
+        this.error = e?.response?.data?.detail || 'Erro ao buscar pedidos da loja.'
+      } finally {
+        this.loading = false
+      }
     }
   }
 }) 

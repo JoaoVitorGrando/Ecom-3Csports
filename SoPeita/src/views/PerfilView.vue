@@ -1,10 +1,17 @@
 <template>
-  <div class="perfil-pedidos-wrapper">
-    <div class="perfil-card-area">
-    <div class="perfil-card">
-      <h2 class="perfil-title">Meu Perfil</h2>
-        <div class="perfil-subtitle">Editar perfil:</div>
-      <form @submit.prevent="salvar">
+  <div class="perfil-wrapper-novo">
+    <div class="perfil-menu-novo">
+      <button :class="['perfil-menu-btn', abaAtiva === 'perfil' ? 'ativo' : '']" @click="abaAtiva = 'perfil'">
+        <i class="bi bi-person-circle me-2"></i> Editar Perfil
+      </button>
+      <button :class="['perfil-menu-btn', abaAtiva === 'pedidos' ? 'ativo' : '']" @click="abaAtiva = 'pedidos'">
+        <i class="bi bi-bag-check me-2"></i> Meus Pedidos
+      </button>
+    </div>
+    <div class="perfil-content-novo">
+      <div v-if="abaAtiva === 'perfil'" class="perfil-card-novo">
+        <h2 class="perfil-title-novo mb-3"><i class="bi bi-person-circle me-2"></i>Meu Perfil</h2>
+        <form @submit.prevent="salvar" class="perfil-form-novo">
         <div class="mb-3">
           <label class="form-label">Nome</label>
           <input v-model="nome" type="text" class="form-control" required />
@@ -17,136 +24,128 @@
             <label class="form-label">Nova senha <span class="form-label-optional">(opcional)</span></label>
             <input v-model="senha" type="password" class="form-control" placeholder="Deixe em branco para não alterar" autocomplete="new-password" />
         </div>
-        <button type="submit" class="btn-perfil">Salvar alterações</button>
+          <button type="submit" class="btn-perfil-novo">Salvar alterações</button>
         <div v-if="sucesso" class="perfil-success mt-3">Dados atualizados com sucesso!</div>
       </form>
       </div>
-    </div>
-    <div class="pedidos-card-area">
-      <div class="benefits-bar">
-        <div class="benefit-mini-card">
-          <i class="bi bi-truck"></i>
-          <div>
-            <div class="benefit-title">Entrega Garantida</div>
-            <div class="benefit-desc">Loja referência no mercado.</div>
-          </div>
-        </div>
-        <div class="benefit-mini-card">
-          <i class="bi bi-shield-lock"></i>
-          <div>
-            <div class="benefit-title">Pagamento Seguro</div>
-            <div class="benefit-desc">Aceitamos Cartão ou PIX.</div>
-          </div>
-        </div>
-        <div class="benefit-mini-card">
-          <i class="bi bi-headset"></i>
-          <div>
-            <div class="benefit-title">Suporte ao Cliente</div>
-            <div class="benefit-desc">Seg. a Sex. 9h às 18h</div>
-          </div>
-        </div>
-        <div class="benefit-mini-card">
-          <i class="bi bi-emoji-smile"></i>
-          <div>
-            <div class="benefit-title">Cliente Satisfeito</div>
-            <div class="benefit-desc">Garantia de compra ou seu dinheiro de volta!</div>
-          </div>
-        </div>
-      </div>
-      <div class="pedidos-container" id="pedidos">
-        <h3 class="pedidos-title">Meus Pedidos</h3>
+      <div v-else-if="abaAtiva === 'pedidos'" class="pedidos-container-novo">
+        <h3 class="pedidos-title-novo mb-4"><i class="bi bi-bag-check me-2"></i>Meus Pedidos</h3>
         <div v-if="ordersLoading" class="text-center py-4">Carregando pedidos...</div>
         <div v-else-if="ordersError" class="alert alert-danger text-center">{{ ordersError }}</div>
         <div v-else-if="orders.length === 0" class="text-center py-4 text-muted">Você ainda não fez nenhum pedido.</div>
-        <div v-else class="pedidos-list">
-          <div v-for="order in orders" :key="order.id" class="pedido-card">
-            <div class="pedido-header">
-              <span class="pedido-id">Pedido #{{ order.id }}</span>
-              <span class="pedido-date">{{ formatDate(order.created_at) }}</span>
-              <span class="pedido-status" :class="'status-' + (order.status || 'pendente').toLowerCase()">
+        <div v-else class="pedidos-list-novo">
+          <div v-for="order in orders" :key="order.id" class="pedido-card pedido-card-novo">
+            <div class="pedido-header-novo d-flex flex-wrap align-items-center justify-content-between mb-2">
+              <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+                <span class="pedido-id-novo">#{{ order.id }}</span>
+                <span class="pedido-date-novo">{{ formatDate(order.created_at) }}</span>
+                <span class="pedido-status-novo" :class="'status-' + (order.status || 'pendente').toLowerCase()">
                 {{ statusLabel(order.status) }}
               </span>
-            </div>
-            <div class="pedido-products">
-              <div v-for="item in order.items" :key="item.id" class="pedido-product">
-                <img :src="getImage(item.product?.image || item.image || item.product?.image_path)" class="pedido-product-img" alt="Produto" />
-                <div class="pedido-product-info">
-                  <div class="pedido-product-title">{{ item.product?.name || item.name }}</div>
-                  <div class="pedido-product-qtd">
-                    Qtd: {{ item.quantity }}
-                    <span v-if="item.size" class="pedido-product-size">&nbsp;|&nbsp;Tamanho: {{ item.size }}</span>
-                  </div>
-                  <div class="pedido-product-price">Unitário: R$ {{ Number(item.unit_price).toFixed(2) }}</div>
-                  <div class="pedido-product-total">Total: <b>R$ {{ (Number(item.unit_price) * item.quantity).toFixed(2) }}</b></div>
-                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                <button class="btn btn-outline-dark btn-sm px-3 py-1 rounded-pill" @click="rastrear(order)"><i class="bi bi-truck"></i> Rastrear</button>
+                <button class="btn btn-outline-secondary btn-sm px-3 py-1 rounded-pill" @click="abrirDetalhesPedido(order)">
+                  <i class="bi bi-info-circle"></i> Detalhes
+                </button>
               </div>
             </div>
-            <div class="pedido-footer">
-              <span class="pedido-total">Total: <b>R$ {{ Number(order.total).toFixed(2) }}</b></span>
-              <button class="btn-rastrear" @click="rastrear(order)">
-                <i class="bi bi-truck"></i> Rastrear pedido
-              </button>
+            <div v-if="order.showDetails" class="pedido-detalhes-tabela mt-2 mb-2">
+              <table class="table table-sm table-borderless mb-0">
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Qtd</th>
+                    <th>Tam.</th>
+                    <th>Unitário</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in order.products" :key="item.id || item.name">
+                    <td class="d-flex align-items-center gap-2">
+                      <img :src="getImage(item.image || item.image_path)" class="pedido-product-img-novo" alt="Produto" />
+                      <span>{{ item.name }}</span>
+                    </td>
+                    <td>{{ item.quantity || 1 }}</td>
+                    <td>{{ item.size || '-' }}</td>
+                    <td>R$ {{ Number(item.price).toFixed(2) }}</td>
+                    <td>R$ {{ (Number(item.price) * (item.quantity || 1)).toFixed(2) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+                  </div>
+            <div class="pedido-footer-novo d-flex flex-wrap align-items-center justify-content-between mt-2 pt-2 border-top">
+              <div>
+                <div class="small text-muted">Subtotal: R$ {{
+                  order.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0).toFixed(2)
+                }}</div>
+                <div v-if="order.coupon_id && cupons.length" class="small text-success">
+                  Cupom aplicado: -{{ getCupomDesconto(order) }}%
+                </div>
+                <span class="pedido-total-novo">
+                  Total: <b>R$ {{
+                    getTotalComDesconto(order)
+                  }}</b>
+                </span>
+              </div>
+              <span class="pedido-status-novo badge px-3 py-2 ms-2" :class="'status-' + (order.status || 'pendente').toLowerCase()">
+                {{ statusLabel(order.status) }}
+              </span>
             </div>
           </div>
         </div>
       </div>
+      <div v-if="pedidoSelecionado" class="pedido-detalhes-modal">
+        <div class="pedido-detalhes-header d-flex justify-content-between align-items-center mb-3">
+          <h5>Detalhes do Pedido #{{ pedidoSelecionado.id }}</h5>
+          <button class="btn-close" @click="fecharDetalhesPedido()"></button>
     </div>
-  </div>
-  <!-- Seção de Depoimentos e Institucional -->
-  <div class="depoimentos-section">
-    <h3 class="depoimentos-title">O que falam sobre nós</h3>
-    <div class="depoimentos-list">
-      <div class="depoimento-card">
-        <div class="depoimento-text">"Comprei na BlackFriday e demorou muito chegar, porém tudo perfeito, a personalização com meu nome e número ficaram ótimas."</div>
-        <div class="depoimento-info">
-          <span class="depoimento-nome">Chrystian Lima</span>
-          <span class="depoimento-data">5 de Novembro de 2024</span>
-          <span class="depoimento-verificado">Avaliação verificada</span>
+        <div class="pedido-detalhes-menu mb-3 d-flex gap-2">
+          <button :class="['pedido-detalhes-tab', abaPedido==='resumo' ? 'ativo' : '']" @click="abaPedido='resumo'">Resumo</button>
+          <button :class="['pedido-detalhes-tab', abaPedido==='produtos' ? 'ativo' : '']" @click="abaPedido='produtos'">Produtos</button>
+          <button :class="['pedido-detalhes-tab', abaPedido==='comprador' ? 'ativo' : '']" @click="abaPedido='comprador'">Comprador</button>
+          <button :class="['pedido-detalhes-tab', abaPedido==='endereco' ? 'ativo' : '']" @click="abaPedido='endereco'">Entrega</button>
         </div>
-      </div>
-      <div class="depoimento-card">
-        <div class="depoimento-text">"Já comprei em várias vezes na BlackHype, a loja se destaca pelo compromisso com o cliente. Sempre recebi muita atenção no Suporte, Recomendo demais, Equipe Nota 10"</div>
-        <div class="depoimento-info">
-          <span class="depoimento-nome">João Pereira</span>
-          <span class="depoimento-data">15 de Outubro de 2024</span>
-          <span class="depoimento-verificado">Avaliação verificada</span>
+        <div v-if="abaPedido==='resumo'">
+          <div><b>Status:</b> {{ statusLabel(pedidoSelecionado.status) }}</div>
+          <div><b>Data:</b> {{ formatDate(pedidoSelecionado.created_at) }}</div>
+          <div><b>ID do Pedido:</b> {{ pedidoSelecionado.id }}</div>
+          <div><b>Forma de Pagamento:</b> {{ pedidoSelecionado.payment_method || '-' }}</div>
+          <div><b>Cupom:</b> <span v-if="pedidoSelecionado.coupon_id && cupons.length">-{{ getCupomDesconto(pedidoSelecionado) }}%</span><span v-else>-</span></div>
+          <div><b>Subtotal:</b> R$ {{ pedidoSelecionado.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0).toFixed(2) }}</div>
+          <div v-if="pedidoSelecionado.coupon_id && cupons.length"><b>Desconto:</b> -R$ {{ (pedidoSelecionado.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0) * (getCupomDesconto(pedidoSelecionado)/100)).toFixed(2) }}</div>
+          <div><b>Total:</b> R$ {{ getTotalComDesconto(pedidoSelecionado) }}</div>
         </div>
-      </div>
-      <div class="depoimento-card">
-        <div class="depoimento-text">"Camiseta de ótima qualidade! Pedi do Santos NEYMAR PRIME, Chegou em torno de 22 dias e bem embalada. Comprarei novamente!"</div>
-        <div class="depoimento-info">
-          <span class="depoimento-nome">Amanda Valeriano</span>
-          <span class="depoimento-data">28 de janeiro de 2025</span>
-          <span class="depoimento-verificado">Avaliação verificada</span>
+        <div v-else-if="abaPedido==='produtos'">
+          <table class="table table-sm">
+            <thead><tr><th>Produto</th><th>Qtd</th><th>Tam.</th><th>Unitário</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr v-for="item in pedidoSelecionado.products" :key="item.id || item.name">
+                <td class="d-flex align-items-center gap-2">
+                  <img :src="getImage(item.image || item.image_path)" class="pedido-product-img-novo" alt="Produto" />
+                  <span>{{ item.name }}</span>
+                </td>
+                <td>{{ item.quantity || 1 }}</td>
+                <td>{{ item.size || '-' }}</td>
+                <td>R$ {{ Number(item.price).toFixed(2) }}</td>
+                <td>R$ {{ (Number(item.price) * (item.quantity || 1)).toFixed(2) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div class="depoimento-card">
-        <div class="depoimento-text">"Comprei Recente e me Pediram para Avaliar, enfim Loja confiável, preços justos e qualidade top, chegou em 16 dias ÚTEIS"</div>
-        <div class="depoimento-info">
-          <span class="depoimento-nome">Thiago Soares</span>
-          <span class="depoimento-data">10 de abril de 2025</span>
-          <span class="depoimento-verificado">Avaliação verificada</span>
+        <div v-else-if="abaPedido==='comprador'">
+          <div><b>Nome:</b> {{ pedidoSelecionado.client_name || auth.user?.name || '-' }}</div>
+          <div><b>Email:</b> {{ pedidoSelecionado.client_email || auth.user?.email || '-' }}</div>
+          <div><b>Telefone:</b> {{ pedidoSelecionado.client_phone || '-' }}</div>
         </div>
-      </div>
-      <div class="depoimento-card">
-        <div class="depoimento-text">"Rapaz, me surpreendi com a Beleza do Site e Anúncios. Os preços também são imbatíveis, Qualidade nem se fala, são tudo isso que divulgam mesmo, Estão de parabéns!"</div>
-        <div class="depoimento-info">
-          <span class="depoimento-nome">Tadeu Fernandes</span>
-          <span class="depoimento-data">22 de abril de 2025</span>
-          <span class="depoimento-verificado">Avaliação verificada</span>
+        <div v-else-if="abaPedido==='endereco'">
+          <div><b>Endereço:</b> {{ pedidoSelecionado.address?.street || '-' }}, {{ pedidoSelecionado.address?.number || '' }}</div>
+          <div><b>Bairro:</b> {{ pedidoSelecionado.address?.neighborhood || '-' }}</div>
+          <div><b>Cidade:</b> {{ pedidoSelecionado.address?.city || '-' }} - {{ pedidoSelecionado.address?.state || '-' }}</div>
+          <div><b>CEP:</b> {{ pedidoSelecionado.address?.zip_code || '-' }}</div>
+          <div><b>Complemento:</b> {{ pedidoSelecionado.address?.complement || '-' }}</div>
         </div>
-      </div>
-    </div>
-    <div class="institucional-bloco">
-      <div class="institucional-sobre">
-        <h4>Sobre a 3C Sports</h4>
-        <p>Somos apaixonados por esportes e qualidade! Aqui você encontra camisetas, acessórios e produtos oficiais dos maiores clubes nacionais e internacionais, além de lançamentos exclusivos e ofertas imperdíveis. Garantimos entrega rápida, atendimento humanizado e total segurança na sua compra.</p>
-      </div>
-      <div class="institucional-contato">
-        <h4>Fale Conosco</h4>
-        <p><b>Telefone:</b> (33) 99986-8943<br>
-        <b>Email:</b> suporte@3csports.com<br>
-        <b>Atendimento:</b> Seg. a Sex. 9h às 18h.</p>
       </div>
     </div>
   </div>
@@ -157,7 +156,9 @@ import { ref, onMounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
 import { useOrdersStore } from '@/stores/orders'
+import { getCoupons, getCouponsByID } from '@/services/HttpService'
 
+const abaAtiva = ref('perfil')
 const nome = ref('')
 const email = ref('')
 const role = ref('')
@@ -168,6 +169,11 @@ const orders = ref([])
 const ordersLoading = ref(false)
 const ordersError = ref('')
 const senha = ref('')
+const cupons = ref([])
+
+// Adicionar refs para controle de pedido selecionado e aba interna
+const pedidoSelecionado = ref(null)
+const abaPedido = ref('resumo')
 
 function getImage(path) {
   if (!path) return '/default-product.png'
@@ -193,21 +199,45 @@ function statusLabel(status) {
 }
 
 async function fetchOrders() {
-  if (!auth.user?.id) return
+  if (!auth.user?.id) {
+    ordersError.value = 'Você precisa estar logado para visualizar seus pedidos.'
+    orders.value = []
+    return
+  }
+  console.log('Buscando pedidos SÓ do usuário logado, ID:', auth.user.id)
   ordersLoading.value = true
   try {
     orders.value = await ordersStore.fetchClientOrders(auth.user.id) || []
+    cupons.value = await getCoupons() || []
     ordersError.value = ''
+    if (orders.value.length === 0) {
+      ordersError.value = 'Você ainda não fez nenhum pedido.'
+    }
   } catch (e) {
+    if (e?.response?.status === 403) {
+      ordersError.value = 'Você não tem permissão para visualizar esses pedidos. Faça login novamente.'
+    } else if (e?.response?.status === 401) {
+      ordersError.value = 'Sessão expirada. Faça login novamente.'
+    } else {
     ordersError.value = e?.response?.data?.detail || 'Erro ao buscar pedidos.'
+    }
+    orders.value = []
   } finally {
     ordersLoading.value = false
   }
 }
 
 function rastrear(order) {
-  // Exemplo: abrir modal ou redirecionar para página de rastreamento
   showToast('Funcionalidade de rastreamento em breve!', 'info')
+}
+
+function abrirDetalhesPedido(order) {
+  if (!order) return
+  pedidoSelecionado.value = order
+  abaPedido.value = 'resumo'
+}
+function fecharDetalhesPedido() {
+  pedidoSelecionado.value = null
 }
 
 onMounted(async () => {
@@ -217,13 +247,9 @@ onMounted(async () => {
     email.value = auth.user?.email || ''
     role.value = auth.user?.role || ''
     await fetchOrders()
-    // Scroll suave para pedidos se hash estiver presente
     await nextTick()
     if (window.location.hash === '#pedidos') {
-      const pedidosSection = document.getElementById('pedidos')
-      if (pedidosSection) {
-        pedidosSection.scrollIntoView({ behavior: 'smooth' })
-      }
+      abaAtiva.value = 'pedidos'
     }
   } catch (e) {
     showToast('Erro ao carregar dados do perfil.', 'error')
@@ -246,87 +272,111 @@ async function salvar() {
     showToast('Erro ao atualizar perfil.', 'error')
   }
 }
+
+function getCupomDesconto(order) {
+  if (!order.coupon_id || !cupons.value.length) return 0
+  const cupom = cupons.value.find(c => c.id === order.coupon_id)
+  return cupom ? cupom.discount_percentage : 0
+}
+function getTotalComDesconto(order) {
+  const subtotal = order.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0)
+  const desconto = getCupomDesconto(order)
+  if (desconto > 0) {
+    return (subtotal * (1 - desconto / 100)).toFixed(2)
+  }
+  return isNaN(Number(order.total)) ? subtotal.toFixed(2) : Number(order.total).toFixed(2)
+}
 </script>
 
 <style scoped>
-.perfil-pedidos-wrapper {
+.perfil-wrapper-novo {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 1.2rem;
   min-height: 100vh;
   background: #f6f7f9;
-  padding: 40px 16px 60px 16px;
+  padding: 24px 8px 8px 8px;
 }
 @media (min-width: 900px) {
-  .perfil-pedidos-wrapper {
+  .perfil-wrapper-novo {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    gap: 3.5rem;
-    padding: 60px 32px 80px 32px;
+    gap: 2rem;
+    padding: 32px 16px 16px 16px;
   }
 }
-.perfil-card-area {
-  flex: 1 1 340px;
-  max-width: 400px;
+.perfil-menu-novo {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: row;
+  gap: 1.2rem;
+  margin-bottom: 2.2rem;
+  align-items: flex-start;
 }
-.pedidos-card-area {
-  flex: 2 1 600px;
+@media (min-width: 900px) {
+  .perfil-menu-novo {
+    flex-direction: column;
+    gap: 1.2rem;
+    min-width: 200px;
+    margin-bottom: 0;
+  }
+}
+.perfil-menu-btn {
+  background: #FFD600;
+  border: 1.5px solid #FFD600;
+  border-radius: 1.2rem;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #232323;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  box-shadow: 0 1px 8px rgba(24,24,27,0.04);
+  text-align: left;
+  width: 200px;
+  min-width: 180px;
+  max-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.perfil-menu-btn.ativo, .perfil-menu-btn:hover, .perfil-menu-btn:focus {
+  background: #232323;
+  color: #FFD600;
+  border-color: #232323;
+}
+.perfil-content-novo {
+  flex: 1 1 600px;
   min-width: 0;
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: stretch;
 }
-.perfil-card {
+.perfil-card-novo {
   background: #fff;
   border-radius: 1.5rem;
   box-shadow: 0 2px 16px rgba(24,24,27,0.07);
-  padding: 2.5rem 2rem 2rem 2rem;
+  padding: 1.5rem 1rem 1rem 1rem;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   border: 1px solid #ececec;
+  margin-bottom: 0.2rem;
 }
-.perfil-title {
+.perfil-title-novo {
   font-size: 2.2rem;
   font-weight: 900;
   color: #232323;
-  margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
   text-align: left;
 }
-.perfil-subtitle {
-  font-size: 1.08rem;
-  color: #888;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  margin-top: 0.2rem;
-  letter-spacing: 0.2px;
+.perfil-form-novo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
 }
-.form-label {
-  color: #232323;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
-.form-control {
-  border-radius: 1.2rem;
-  border: 1.5px solid #e3e3e3;
-  padding: 0.8rem 1.1rem;
-  font-size: 1.05rem;
-  margin-bottom: 1.1rem;
-  background: #f8fafc;
-  color: #232323;
-  transition: border 0.2s;
-  box-shadow: none;
-}
-.form-control:focus {
-  border-color: #232323;
-  background: #fff;
-  outline: none;
-}
-.btn-perfil {
+.btn-perfil-novo {
   background: #232323;
   color: #fff;
   font-weight: 700;
@@ -338,34 +388,43 @@ async function salvar() {
   box-shadow: 0 1px 8px rgba(24,24,27,0.06);
   transition: background 0.2s, color 0.2s;
 }
-.btn-perfil:hover, .btn-perfil:focus {
+.btn-perfil-novo:hover, .btn-perfil-novo:focus {
   background: #FFD600;
   color: #232323;
 }
-.perfil-success {
-  background: #f6f7f9;
-  color: #232323;
-  border-radius: 1rem;
-  padding: 0.7rem 1rem;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  text-align: center;
-  border: 1px solid #ececec;
-}
-.perfil-card form {
+.benefits-bar-novo {
   display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2.2rem;
+  justify-content: center;
 }
-.perfil-card .mb-3 {
-  margin-bottom: 1.1rem !important;
+.benefit-card-novo {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px rgba(24,24,27,0.06);
+  border: 1px solid #ececec;
+  min-width: 180px;
+  max-width: 220px;
+  flex: 1 1 180px;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-.form-label-optional {
-  color: #bbb;
-  font-size: 0.98em;
-  font-weight: 400;
+.benefit-card-novo:hover {
+  box-shadow: 0 4px 24px rgba(24,24,27,0.10);
+  transform: translateY(-4px) scale(1.03);
 }
-.pedidos-container {
+.benefit-title-novo {
+  font-size: 1.13rem;
+  color: #232323;
+  margin-bottom: 0.2rem;
+}
+.benefit-desc-novo {
+  font-size: 0.98rem;
+  color: #888;
+}
+.pedidos-container-novo {
   background: #fff;
   border-radius: 1.5rem;
   box-shadow: 0 2px 16px rgba(24,24,27,0.07);
@@ -374,7 +433,7 @@ async function salvar() {
   border: 1px solid #ececec;
   min-width: 0;
 }
-.pedidos-title {
+.pedidos-title-novo {
   font-size: 1.5rem;
   font-weight: 800;
   color: #232323;
@@ -382,12 +441,12 @@ async function salvar() {
   letter-spacing: 0.5px;
   text-align: left;
 }
-.pedidos-list {
+.pedidos-list-novo {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
-.pedido-card {
+.pedido-card-novo {
   border: 1.5px solid #e3e3e3;
   border-radius: 1.2rem;
   padding: 1.2rem 1.1rem 1.1rem 1.1rem;
@@ -396,17 +455,22 @@ async function salvar() {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+  margin-bottom: 1.2rem;
 }
-.pedido-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  gap: 0.7rem;
+.pedido-header-novo {
   border-bottom: 1px solid #ececec;
   padding-bottom: 0.4rem;
 }
-.pedido-status {
+.pedido-id-novo {
+  font-size: 1.05rem;
+  color: #888;
+  font-weight: 600;
+}
+.pedido-date-novo {
+  font-size: 0.97rem;
+  color: #bbb;
+}
+.pedido-status-novo {
   font-weight: 700;
   font-size: 0.98rem;
   padding: 0.25rem 0.9rem;
@@ -422,71 +486,22 @@ async function salvar() {
 .status-processando { background: #fffbe6; color: #7f6a1a; }
 .status-cancelado { background: #ffe6e6; color: #7f1a1a; }
 .status-pendente { background: #f3f3f3; color: #232323; }
-.pedido-date {
-  font-size: 0.97rem;
-  color: #888;
-  min-width: 110px;
-  text-align: right;
-}
-.pedido-id {
-  font-size: 0.97rem;
-  color: #bbb;
-  min-width: 110px;
-  text-align: left;
-}
-.pedido-products {
-  display: flex;
-  gap: 1.1rem;
-  margin-bottom: 0.5rem;
-  flex-wrap: wrap;
-}
-.pedido-product {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: #fff;
-  border-radius: 0.8rem;
-  padding: 0.4rem 0.9rem;
-  box-shadow: 0 1px 4px rgba(24,24,27,0.03);
-  border: 1px solid #ececec;
-}
-.pedido-product-img {
-  width: 46px;
-  height: 46px;
+.pedido-product-img-novo {
+  width: 38px;
+  height: 38px;
   object-fit: contain;
   border-radius: 0.5rem;
   background: #f8fafc;
   border: 1px solid #eee;
 }
-.pedido-product-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+.pedido-detalhes-tabela {
+  background: #fff;
+  border-radius: 0.7rem;
+  box-shadow: 0 1px 4px rgba(24,24,27,0.03);
+  padding: 0.7rem 0.5rem;
+  margin-bottom: 0.5rem;
 }
-.pedido-product-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #232323;
-}
-.pedido-product-qtd {
-  font-size: 0.93rem;
-  color: #888;
-}
-.pedido-product-size {
-  color: #bbb;
-  font-size: 0.93rem;
-}
-.pedido-product-price {
-  font-size: 0.98rem;
-  color: #232323;
-  font-weight: 500;
-}
-.pedido-product-total {
-  font-size: 1.01rem;
-  color: #232323;
-  font-weight: 600;
-}
-.pedido-footer {
+.pedido-footer-novo {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -494,161 +509,42 @@ async function salvar() {
   border-top: 1px solid #ececec;
   padding-top: 0.4rem;
 }
-.pedido-total {
-  font-size: 1.05rem;
+.pedido-total-novo {
+  font-size: 1.08rem;
   color: #232323;
+  font-weight: 700;
 }
-.btn-rastrear {
-  background: #232323;
-  color: #fff;
-  border: none;
-  border-radius: 1.1rem;
-  padding: 0.45rem 1.1rem;
-  font-size: 0.98rem;
-  font-weight: 600;
+.pedido-detalhes-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 9999;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: background 0.2s, color 0.2s;
+  justify-content: center;
 }
-.btn-rastrear:hover, .btn-rastrear:focus {
+.pedido-detalhes-modal > div {
+  background: #fff;
+  border-radius: 1.2rem;
+  padding: 2rem 2.5rem;
+  min-width: 350px;
+  max-width: 95vw;
+  box-shadow: 0 2px 32px rgba(0,0,0,0.13);
+}
+.pedido-detalhes-header { border-bottom: 1px solid #eee; }
+.pedido-detalhes-menu { gap: 0.5rem; }
+.pedido-detalhes-tab {
+  background: #f5f5f5;
+  border: none;
+  border-radius: 1rem 1rem 0 0;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  color: #232323;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.pedido-detalhes-tab.ativo, .pedido-detalhes-tab:hover {
   background: #FFD600;
   color: #232323;
-}
-/* Benefits bar */
-.benefits-bar {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.2rem;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-}
-@media (max-width: 900px) {
-  .benefits-bar {
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-  .benefit-mini-card {
-    min-width: 140px;
-    flex: 1 1 140px;
-  }
-}
-.benefit-mini-card {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: #fff;
-  border: none;
-  border-radius: 0.7rem;
-  padding: 0.22rem 0.6rem 0.22rem 0.5rem;
-  min-width: 120px;
-  max-width: 160px;
-  min-height: 32px;
-  box-shadow: none;
-  flex: 1 1 120px;
-}
-.benefit-mini-card i {
-  font-size: 0.95rem;
-  color: #bdbdbd;
-  opacity: 1;
-}
-.benefit-title {
-  font-size: 0.91rem;
-  font-weight: 600;
-  color: #232323;
-  margin-bottom: 0.02rem;
-}
-.benefit-desc {
-  font-size: 0.82rem;
-  color: #bdbdbd;
-  font-weight: 400;
-  line-height: 1.05;
-}
-.depoimentos-section {
-  background: #fff;
-  border-radius: 1.5rem;
-  box-shadow: 0 2px 16px rgba(24,24,27,0.04);
-  margin: 48px auto 0 auto;
-  padding: 2.5rem 2rem 2.2rem 2rem;
-  max-width: 1100px;
-}
-.depoimentos-title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #232323;
-  margin-bottom: 1.2rem;
-  letter-spacing: 0.5px;
-  text-align: left;
-}
-.depoimentos-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  margin-bottom: 2.2rem;
-}
-.depoimento-card {
-  background: #fafbfc;
-  border-radius: 1.1rem;
-  box-shadow: 0 1px 6px rgba(24,24,27,0.03);
-  border: 1px solid #ececec;
-  padding: 1.1rem 1.2rem 0.9rem 1.2rem;
-  min-width: 220px;
-  max-width: 320px;
-  flex: 1 1 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-.depoimento-text {
-  font-size: 1.01rem;
-  color: #232323;
-  font-weight: 500;
-  margin-bottom: 0.3rem;
-}
-.depoimento-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  align-items: center;
-  font-size: 0.93rem;
-  color: #888;
-}
-.depoimento-nome {
-  font-weight: 700;
-  color: #232323;
-}
-.depoimento-data {
-  color: #bbb;
-}
-.depoimento-verificado {
-  color: #1a7f37;
-  font-weight: 600;
-  font-size: 0.92em;
-  background: #e6ffe6;
-  border-radius: 0.7em;
-  padding: 0.1em 0.7em;
-}
-.institucional-bloco {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  margin-top: 2.2rem;
-  border-top: 1px solid #ececec;
-  padding-top: 2.2rem;
-}
-.institucional-sobre, .institucional-contato {
-  flex: 1 1 320px;
-}
-.institucional-sobre h4, .institucional-contato h4 {
-  font-size: 1.08rem;
-  font-weight: 800;
-  color: #232323;
-  margin-bottom: 0.7rem;
-}
-.institucional-sobre p, .institucional-contato p {
-  color: #232323;
-  font-size: 0.98rem;
-  margin-bottom: 0;
 }
 </style> 

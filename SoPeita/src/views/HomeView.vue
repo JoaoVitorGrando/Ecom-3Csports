@@ -9,14 +9,19 @@
         </div>
       </div>
     </div>
+    <div class="row justify-content-center mb-4">
+      <div class="col-12 col-lg-10">
+        <ClubesCarousel />
+      </div>
+    </div>
     <!-- Banner promocional extra 1 -->
     <div class="banner-extra mb-5 d-flex align-items-center justify-content-center">
-      <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80" alt="Promoção" class="banner-img rounded-4 shadow" style="max-width:100%;height:180px;object-fit:cover;" />
+      <img src="@/assets/banner3.png" alt="Banner" class="banner-img rounded-4 shadow" style="max-width:100%;height:180px;object-fit:cover;" />
     </div>
     <div class="content-home px-3 py-5">
       <!-- Lançamentos -->
       <section class="products" id="produtos">
-        <h2 class="mb-5 text-center fw-bold display-4 text-dark">Lançamentos</h2>
+        <h2 class="mb-5 text-center fw-bold display-4 text-dark">Destaques</h2>
         <div class="produtos-grid">
           <div v-for="product in produtosFiltrados" :key="product.id" class="produto-card-wrapper">
             <ProductCard
@@ -27,40 +32,86 @@
           </div>
         </div>
       </section>
-      <!-- Carrossel de clubes -->
-      <ClubesCarousel />
       <!-- Banner promocional extra 2 -->
       <div class="banner-extra mb-5 d-flex align-items-center justify-content-center">
-        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="Promoção 2" class="banner-img rounded-4 shadow" style="max-width:100%;height:180px;object-fit:cover;" />
+        <img src="@/assets/2.png" alt="Banner" class="banner-img rounded-4 shadow" style="max-width:100%;height:180px;object-fit:cover;" />
       </div>
-      <!-- Vantagens -->
-      <Vantagens />
-      <!-- Depoimentos -->
-      <section class="feedback-section py-5">
-        <Depoimentos />
+      <!-- Vantagens Minimalistas -->
+      <section class="vantagens-minimalista d-flex flex-wrap justify-content-center gap-4 py-4">
+        <div class="vantagem-item text-center">
+          <i class="bi bi-shield-check fs-2 mb-2"></i>
+          <div class="fw-bold">Entrega Garantida</div>
+          <div class="text-muted small">Referência no mercado</div>
+        </div>
+        <div class="vantagem-item text-center">
+          <i class="bi bi-credit-card-2-front fs-2 mb-2"></i>
+          <div class="fw-bold">Pagamento Seguro</div>
+          <div class="text-muted small">Cartão ou PIX</div>
+        </div>
+        <div class="vantagem-item text-center">
+          <i class="bi bi-headset fs-2 mb-2"></i>
+          <div class="fw-bold">Suporte ao Cliente</div>
+          <div class="text-muted small">Seg. a Sex. 9h-18h</div>
+        </div>
+        <div class="vantagem-item text-center">
+          <i class="bi bi-emoji-smile fs-2 mb-2"></i>
+          <div class="fw-bold">Cliente Satisfeito</div>
+          <div class="text-muted small">Garantia ou dinheiro de volta</div>
+        </div>
       </section>
-      <!-- Institucional -->
-      <section class="institucional py-5">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-12 col-md-6 mb-4 mb-md-0">
-              <h3 class="fw-bold mb-3">Sobre a 3C Sports</h3>
-              <p>Somos apaixonados por esportes e qualidade! Aqui você encontra camisetas, acessórios e produtos oficiais dos maiores clubes nacionais e internacionais, além de lançamentos exclusivos e ofertas imperdíveis. Garantimos entrega rápida, atendimento humanizado e total segurança na sua compra.</p>
-            </div>
-            <div class="col-12 col-md-5">
-              <h4 class="fw-bold mb-2">Fale Conosco</h4>
-              <ul class="list-unstyled mb-2">
-                <li><i class="bi bi-whatsapp text-success me-2"></i> (33) 99986-8943</li>
-                <li><i class="bi bi-envelope text-warning me-2"></i> suporte@3csports.com</li>
-                <li><i class="bi bi-clock me-2"></i> Seg. a Sex. 9h às 18h</li>
-              </ul>
-              <div class="mt-3">
-                <a href="#" class="btn btn-amarelo fw-bold px-4 py-2 me-2 mb-2"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
-                <a href="#" class="btn btn-outline-secondary fw-bold px-4 py-2 mb-2"><i class="bi bi-envelope me-1"></i> E-mail</a>
-              </div>
-            </div>
+      <!-- Depoimentos Minimalistas -->
+      <section class="depoimentos-minimalista py-4">
+        <h3 class="fw-bold text-center mb-4">O que falam sobre nós</h3>
+        <div class="depoimentos-lista d-flex flex-wrap justify-content-center gap-3">
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Comprei na BlackFriday e demorou muito chegar, porém tudo perfeito, a personalização com meu nome e número ficaram ótimas."</div>
+            <div class="depoimento-nome fw-bold">Chrystian Lima</div>
+            <div class="depoimento-data text-muted small">5/11/2024</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Já comprei várias vezes, loja se destaca pelo compromisso com o cliente. Sempre recebi atenção no Suporte. Recomendo!"</div>
+            <div class="depoimento-nome fw-bold">João Pereira</div>
+            <div class="depoimento-data text-muted small">15/10/2024</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Camiseta de ótima qualidade! Chegou em torno de 22 dias e bem embalada. Comprarei novamente!"</div>
+            <div class="depoimento-nome fw-bold">Amanda Valeriano</div>
+            <div class="depoimento-data text-muted small">28/01/2025</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Loja confiável, preços justos e qualidade top, chegou em 16 dias ÚTEIS"</div>
+            <div class="depoimento-nome fw-bold">Thiago Soares</div>
+            <div class="depoimento-data text-muted small">10/04/2025</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Me surpreendi com a beleza do site e anúncios. Preços imbatíveis, qualidade excelente. Estão de parabéns!"</div>
+            <div class="depoimento-nome fw-bold">Tadeu Fernandes</div>
+            <div class="depoimento-data text-muted small">22/04/2025</div>
+          </div>
+          <!-- Novos depoimentos -->
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Atendimento rápido e eficiente, tiraram todas as minhas dúvidas. Recomendo a todos!"</div>
+            <div class="depoimento-nome fw-bold">Patrícia Souza</div>
+            <div class="depoimento-data text-muted small">02/05/2025</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Produto chegou antes do prazo, ótima qualidade e embalagem impecável."</div>
+            <div class="depoimento-nome fw-bold">Carlos Alberto</div>
+            <div class="depoimento-data text-muted small">18/05/2025</div>
+          </div>
+          <div class="depoimento-item p-3 rounded shadow-sm bg-white text-center" style="max-width:320px;">
+            <div class="depoimento-texto mb-2">"Fiquei muito satisfeito com a compra, voltarei a comprar em breve!"</div>
+            <div class="depoimento-nome fw-bold">Fernanda Lima</div>
+            <div class="depoimento-data text-muted small">27/05/2025</div>
           </div>
         </div>
+      </section>
+      <!-- Institucional Minimalista -->
+      <section class="institucional-minimalista py-4 text-center bg-light rounded-4 mt-4 mb-0" style="max-width:900px;margin:40px auto 0 auto;">
+        <h4 class="fw-bold mb-2">Sobre a 3C Sports</h4>
+        <p class="mb-2">Loja de materiais esportivos: camisetas, acessórios, produtos oficiais dos maiores clubes, itens para academia, corrida e muito mais. Lançamentos exclusivos, ofertas imperdíveis, entrega rápida e atendimento humanizado.</p>
+        <div class="mb-2"><b>Contato:</b> (33) 99986-8943 &nbsp;|&nbsp; suporte@3csports.com</div>
+        <div class="text-muted small">Seg. a Sex. 9h às 18h</div>
       </section>
     </div>
   </div>

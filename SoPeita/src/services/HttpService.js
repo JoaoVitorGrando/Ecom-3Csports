@@ -123,6 +123,10 @@ export async function deleteProducts(idProd) {
   return (await API.delete(`products/${idProd}`)).data
 }
 
+export async function getProductsByUser(userId) {
+  return (await API.get(`products/user/${userId}`)).data
+}
+
 // ========== ADDRESSES ==========
 export async function getAddresses() {
   return (await API.get('addresses/')).data
@@ -219,6 +223,14 @@ export async function cancelOrder(orderID) {
   return (await API.delete(`orders/${orderID}`)).data
 } 
 
+export async function getAllOrders() {
+  return (await API.get('orders/all')).data
+}
+
+export async function getAllOrdersByAdmin(adminId) {
+  return (await API.get(`orders/all/${adminId}`)).data
+}
+
 // ========== AUTH TOKEN ==========
 export async function renewToken() {
   return (await API.post('renew-token')).data
@@ -228,27 +240,19 @@ export async function verifyToken() {
   return (await API.get('verify-token')).data
 } 
 
-// ========== TAGS ==========
-export async function getTags() {
-  return (await API.get('tags/')).data
+// ========== DESCONTOS ==========
+export async function getDiscounts() {
+  return await API.get('/discounts/').then(r => r.data)
 }
-
-export async function createTag(payload) {
-  return (await API.post('tags/', payload)).data
+export async function getDiscountById(id) {
+  return await API.get(`/discounts/${id}`).then(r => r.data)
 }
-
-export async function updateTag(tagId, payload) {
-  return (await API.put(`tags/${tagId}`, payload)).data
+export async function createDiscount(payload) {
+  return await API.post('/discounts/', payload).then(r => r.data)
 }
-
-export async function deleteTag(tagId) {
-  return (await API.delete(`tags/${tagId}`)).data
+export async function updateDiscount(id, payload) {
+  return await API.put(`/discounts/${id}`, payload).then(r => r.data)
 }
-
-export async function addProductToTag(tagId, productId) {
-  return (await API.post(`tags/${tagId}/products/${productId}`)).data
-}
-
-export async function removeProductFromTag(tagId, productId) {
-  return (await API.delete(`tags/${tagId}/products/${productId}`)).data
+export async function deleteDiscount(id) {
+  return await API.delete(`/discounts/${id}`)
 } 

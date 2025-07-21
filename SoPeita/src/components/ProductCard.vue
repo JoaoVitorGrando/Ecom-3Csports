@@ -3,19 +3,22 @@
     <img :src="getImage(product.image_path)" :alt="product.name" class="card-img-top object-fit-cover rounded-4 mb-3" style="height: 200px;" />
     <div class="position-absolute top-0 start-0 m-3">
       <img v-if="product.escudo" :src="product.escudo" alt="Escudo" style="width:40px;height:40px;" class="bg-white rounded-circle border border-success p-1 shadow" />
+      <span v-if="activeDiscount" class="badge badge-desconto position-absolute top-0 start-0 fs-6 py-2 px-3 rounded-pill shadow">-{{ Number(activeDiscount.discount_percentage).toFixed(0) }}%</span>
     </div>
     <span v-if="product.oficial" class="badge bg-success position-absolute top-0 end-0 m-3 fs-6 py-2 px-3 rounded-pill shadow">Oficial</span>
     <!-- Ícone de detalhes -->
     <button class="btn-detalhes-icon position-absolute top-0 end-0 m-3" @click.stop="goToDetails" title="Ver detalhes">
       <i class="bi bi-search fs-5 icon-preto"></i>
     </button>
-    <!-- Tags discretas -->
-    <div v-if="productTags.length" class="position-absolute end-0 bottom-0 m-2 d-flex flex-column align-items-end gap-1" style="z-index:2;">
-      <span v-for="tag in productTags" :key="tag.id" class="badge tag-badge" :style="{background: tag.color_hex, color: '#222'}">{{ tag.code }}</span>
-    </div>
+    <!-- Remover bloco de exibição de tags e referências ao useTagsStore/productTags. -->
     <div class="card-body d-flex flex-column align-items-center p-0">
       <h5 class="card-title fw-bold text-center mb-2">{{ product.name }}</h5>
-      <p class="card-text text-success fw-semibold mb-3 fs-4">R$ {{ Number(product.price).toFixed(2) }}</p>
+      <div class="precos-produto mb-3">
+        <span v-if="activeDiscount" class="preco-original me-2">R$ {{ Number(product.price).toFixed(2) }}</span>
+        <span class="preco-final text-success fw-semibold fs-4">
+          R$ {{ precoComDesconto }}
+        </span>
+      </div>
       <div class="d-flex w-100 gap-2 mt-auto">
         <button v-if="showCartBtn" @click.stop="$emit('add-to-cart', product)" class="btn btn-outline-preto flex-grow-1 fw-bold rounded-pill shadow" title="Adicionar ao carrinho">
           <i class="bi bi-cart-plus fs-5 icon-preto"></i>
@@ -26,19 +29,13 @@
 </template>
 
 <script setup>
-import { useTagsStore } from '@/stores/tags'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 const props = defineProps({
   product: Object,
   showCartBtn: { type: Boolean, default: false }
 })
-const tagsStore = useTagsStore()
 const router = useRouter()
-// Busca as tags associadas a este produto
-const productTags = computed(() => {
-  return tagsStore.tags.filter(tag => (tag.products || []).some(p => p.id === props.product.id))
-})
 function getImage(path) {
   if (!path) return '/default-product.png'
   if (path.startsWith('http')) return path
@@ -47,6 +44,22 @@ function getImage(path) {
 function goToDetails() {
   router.push({ name: 'detalhe-produto', params: { id: props.product.id } })
 }
+// Badge de desconto ativo
+const activeDiscount = computed(() => {
+  if (!props.product.discounts || !props.product.discounts.length) return null
+  const now = new Date()
+  return props.product.discounts.find(d => {
+    const start = new Date(d.start_date)
+    const end = new Date(d.end_date)
+    return start <= now && now <= end
+  })
+})
+const precoComDesconto = computed(() => {
+  if (!activeDiscount.value) return Number(props.product.price).toFixed(2)
+  const desconto = Number(activeDiscount.value.discount_percentage) || 0
+  const preco = Number(props.product.price) || 0
+  return (preco * (1 - desconto / 100)).toFixed(2)
+})
 </script>
 
 <style scoped>
@@ -157,6 +170,33 @@ function goToDetails() {
   background: #fff;
   color: #18181b;
   border-color: #18181b;
+}
+.badge-desconto {
+  background: #ff1744;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 8px rgba(255,23,68,0.13);
+  z-index: 4;
+  left: 0;
+  top: 0;
+}
+.precos-produto {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+.preco-original {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+.preco-final {
+  color: #1b5e20;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 @media (max-width: 700px) {
   .product-card {

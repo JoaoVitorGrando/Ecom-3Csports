@@ -198,6 +198,8 @@ const cupomValido = ref(false)
 const cupomMensagem = ref('')
 const descontoCupom = ref(0)
 
+let cupomID = null // Definir fora do setup para ser usado em finalizarCompra
+
 const cartStore = useCartStore()
 const addressesStore = useAddressesStore()
 
@@ -240,26 +242,6 @@ async function adicionarEndereco() {
   }
 }
 
-async function finalizarCompra() {
-  if (!enderecoSelecionado.value) {
-    showToast('Selecione um endereço de entrega!', 'error')
-    return
-  }
-  try {
-    // Se houver cupom válido, envie o ID do cupom. Caso contrário, envie só o address_id
-    const payload = { address_id: enderecoSelecionado.value };
-    if (cupomValido.value && typeof cupomID !== 'undefined') {
-      payload.coupon_id = cupomID;
-    }
-    await newOrder(payload)
-    showToast('Compra finalizada com sucesso!', 'success')
-    await cartStore.clearItems()
-    compraFinalizada.value = true
-  } catch (e) {
-    showToast('Erro ao finalizar compra: ' + (e?.detail || e?.message || 'Erro interno'), 'error')
-  }
-}
-
 async function aplicarCupom() {
   try {
     const cupons = await getCoupons()
@@ -268,15 +250,37 @@ async function aplicarCupom() {
       descontoCupom.value = (subtotal.value * (cupom.discount_percentage / 100))
       cupomValido.value = true
       cupomMensagem.value = `Cupom aplicado: -${cupom.discount_percentage}%`;
+      cupomID = cupom.id // Salva o ID do cupom válido
     } else {
       descontoCupom.value = 0
       cupomValido.value = false
       cupomMensagem.value = 'Cupom inválido ou expirado.'
+      cupomID = null
     }
   } catch (e) {
     descontoCupom.value = 0
     cupomValido.value = false
     cupomMensagem.value = 'Erro ao validar cupom.'
+    cupomID = null
+  }
+}
+
+async function finalizarCompra() {
+  if (!enderecoSelecionado.value) {
+    showToast('Selecione um endereço de entrega!', 'error')
+    return
+  }
+  try {
+    const payload = { address_id: enderecoSelecionado.value };
+    if (cupomValido.value && cupomID) {
+      payload.coupon_id = cupomID;
+    }
+    await newOrder(payload)
+    showToast('Compra finalizada com sucesso!', 'success')
+    await cartStore.clearItems()
+    compraFinalizada.value = true
+  } catch (e) {
+    showToast('Erro ao finalizar compra: ' + (e?.detail || e?.message || 'Erro interno'), 'error')
   }
 }
 

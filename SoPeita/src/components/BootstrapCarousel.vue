@@ -1,34 +1,18 @@
 <template>
-  <div id="mainCarousel" class="carousel slide carousel-fade mb-5" data-bs-ride="carousel">
+  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
     <div class="carousel-indicators">
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button v-for="(banner, idx) in banners" :key="idx" type="button" :data-bs-target="'#mainCarousel'" :data-bs-slide-to="idx" :class="{active: idx === 0}" :aria-current="idx === 0 ? 'true' : undefined" :aria-label="'Slide ' + (idx+1)"></button>
     </div>
-    <div class="carousel-inner rounded-4 shadow">
-      <div class="carousel-item active">
-        <img :src="banner1" class="d-block w-100 img-fluid banner-img" alt="Nova Coleção 2024">
-        <div class="carousel-caption custom-caption">
-          <div class="caption-content">
-            <h2 class="caption-title">Nova Coleção</h2>
-            <p class="caption-desc">2024 chegou!</p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img :src="banner2" class="d-block w-100 img-fluid banner-img" alt="Frete grátis nas compras acima de R$199">
-        <div class="carousel-caption custom-caption">
-          <div class="caption-content">
-            <h2 class="caption-title">Frete Grátis</h2>
-            <p class="caption-desc">Acima de R$ 199</p>
-          </div>
-        </div>
+    <div class="carousel-inner rounded-4 shadow banner-carousel-fixed">
+      <div v-for="(banner, idx) in banners" :key="idx" class="carousel-item" :class="{active: idx === 0}">
+        <img :src="banner" class="d-block w-100 img-fluid banner-img" :alt="'Banner ' + (idx+1)">
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide-to="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Anterior</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide-to="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Próximo</span>
     </button>
@@ -36,64 +20,46 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import banner1 from '../assets/banner1.png'
 import banner2 from '../assets/banner2.png'
+import banner4carrose from '../assets/banner4carrose.png'
+import { Carousel } from 'bootstrap'
+
+const banners = [banner1, banner2, banner4carrose]
+
+onMounted(() => {
+  const el = document.getElementById('mainCarousel')
+  if (el) {
+    new Carousel(el, {
+      interval: 5000,
+      ride: 'carousel',
+      wrap: true,
+      pause: false
+    })
+  }
+})
+function logSeta(tipo) {
+  console.log('Seta clicada:', tipo)
+}
 // Nenhuma lógica JS necessária, Bootstrap faz tudo
 </script>
 
 <style scoped>
+.carousel-inner.banner-carousel-fixed {
+  height: 340px;
+}
+.carousel-item {
+  height: 340px;
+  position: relative;
+}
 .banner-img {
   width: 100%;
-  max-width: 100%;
-  height: 340px;
-  min-height: 340px;
-  max-height: 340px;
+  height: 100%;
   object-fit: cover;
-  background: var(--color-bg);
-  transition: background 0.1s;
   display: block;
   margin: 0 auto;
-}
-.custom-caption {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(34,34,34,0.18);
-  border-radius: 2rem;
-  color: #fff;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
-  transition: background 0.3s;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0.7rem 2.2rem 0 2.2rem;
-}
-.caption-content {
-  margin-top: 0.2rem;
-  margin-left: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-.caption-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  text-align: center;
-}
-.caption-desc {
-  font-size: 1rem;
-  font-weight: 400;
-  opacity: 0.85;
-  margin-bottom: 0;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.13);
-  text-align: center;
+  transition: none !important;
 }
 .carousel-btn-fixed {
   position: absolute;
@@ -107,21 +73,38 @@ import banner2 from '../assets/banner2.png'
   font-size: 1.1rem;
   padding: 0.7rem 1.6rem;
 }
+.carousel-control-prev, .carousel-control-next {
+  width: 60px;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  opacity: 0.85;
+  transition: opacity 0.18s;
+  z-index: 20;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-control-prev:hover, .carousel-control-next:hover {
+  opacity: 1;
+  background: rgba(34,34,34,0.08);
+}
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.13));
+}
 @media (max-width: 700px) {
-  .banner-img {
+  .carousel-inner.banner-carousel-fixed {
     height: 160px;
   }
-  .custom-caption {
-    padding: 0.2rem 0.2rem 0 0.2rem;
-    border-radius: 1rem;
+  .carousel-item {
+    height: 160px;
   }
-  .caption-title {
-    font-size: 1rem;
-    margin-bottom: 0.1rem;
-  }
-  .caption-desc {
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
+  .banner-img {
+    height: 100%;
   }
   .carousel-btn-fixed {
     bottom: 0.4rem;

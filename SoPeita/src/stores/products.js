@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getAllProducts, getProduct, createProducts, updateProduct, deleteProducts } from '../services/HttpService'
+import { getAllProducts, getProduct, createProducts, updateProduct, deleteProducts, getProductsByUser } from '../services/HttpService'
 
 export const useProductsStore = defineStore('products', {
   state: () => ({
@@ -30,6 +30,17 @@ export const useProductsStore = defineStore('products', {
     },
     async deleteProduct(id) {
       return await deleteProducts(id)
+    },
+    async fetchProductsByUser(userId) {
+      this.loading = true
+      try {
+        this.products = await getProductsByUser(userId)
+        this.error = ''
+      } catch (e) {
+        this.error = e?.response?.data?.detail || 'Erro ao buscar produtos do usuário.'
+      } finally {
+        this.loading = false
+      }
     }
   }
 }) 
