@@ -1,103 +1,135 @@
 <template>
-  <nav :class="['navbar header-fixed py-3', isDark ? 'navbar-dark' : 'navbar-light']">
-    <div class="container-fluid d-flex align-items-center position-relative flex-wrap" style="min-height:64px;">
-      <!-- Remover botão menu lateral mobile -->
-      <!-- <button class="btn btn-outline-success me-2 position-relative z-2 d-lg-none" @click="openSideMenu" aria-label="Abrir menu lateral">
-        <i class="bi bi-list fs-3"></i>
-      </button> -->
-      <router-link class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 mx-0 site-title-link" to="/" style="pointer-events:auto;">
-        <span class="fw-bold text-preto">3C</span> <span class="fw-bold text-amarelo">sports</span>
+  <nav :class="['header-navbar', isDark ? 'header-dark' : 'header-light']">
+    <div class="header-container">
+      <router-link class="header-brand" to="/">
+        <span class="brand-text brand-preto">3C</span> 
+        <span class="brand-text brand-amarelo">sports</span>
       </router-link>
-      <!-- Mobile: busca ao lado da logo -->
-      <form class="search-bar d-flex d-md-none align-items-center ms-2 flex-shrink-1" @submit.prevent="onSearch" style="max-width: 140px; min-width: 0; height: 36px;">
-        <input v-model="searchQuery" class="form-control rounded-pill px-2 py-1" placeholder="Buscar..." aria-label="Buscar produtos" style="font-size:0.98rem; height:32px;" />
-        <button type="submit" class="btn btn-outline-preto rounded-pill ms-1 px-2 py-1 d-flex align-items-center justify-content-center" style="height:32px; font-size:1.1rem;"><i class="bi bi-search icon-preto"></i></button>
+      
+      <form class="search-bar search-mobile" @submit.prevent="onSearch">
+        <input 
+          v-model="searchQuery" 
+          class="search-input" 
+          placeholder="Buscar..." 
+          aria-label="Buscar produtos" 
+        />
+        <button type="submit" class="search-btn">
+          <i class="bi bi-search search-icon"></i>
+        </button>
       </form>
-      <!-- Itens desktop -->
-      <ul class="nav nav-categories d-none d-lg-flex ms-4">
+      
+      <ul class="nav-categories">
         <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Futebol' } }">Futebol</router-link>
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Futebol' } }">
+            Futebol
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Corrida' } }">Corrida</router-link>
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Corrida' } }">
+            Corrida
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Academia' } }">Academia</router-link>
+          <router-link class="nav-link" :to="{ name: 'produtos', query: { categoria: 'Academia' } }">
+            Academia
+          </router-link>
         </li>
       </ul>
-      <!-- Carrinho -->
-      <!-- Remover carrinho duplicado fora do bloco de botões -->
-      <!-- O carrinho deve ficar apenas dentro do <div class="d-flex align-items-center gap-2 ms-auto ..."> -->
-      <!-- Lupa busca desktop -->
-      <form class="search-bar mx-auto flex-grow-1 d-none d-md-flex" @submit.prevent="onSearch" style="max-width: 340px; min-width: 180px;">
-        <input v-model="searchQuery" type="text" class="form-control rounded-pill px-3" placeholder="Buscar produtos..." aria-label="Buscar produtos" />
-        <button type="submit" class="btn btn-outline-preto rounded-pill ms-2 px-3 d-flex align-items-center justify-content-center"><i class="bi bi-search icon-preto"></i></button>
+      
+      <form class="search-bar search-desktop" @submit.prevent="onSearch">
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          class="search-input" 
+          placeholder="Buscar produtos..." 
+          aria-label="Buscar produtos" 
+        />
+        <button type="submit" class="search-btn">
+          <i class="bi bi-search search-icon"></i>
+        </button>
       </form>
-      <!-- Lupa busca mobile -->
-      <div class="d-flex align-items-center gap-2 ms-auto position-relative z-2">
-        <button @click="toggleTheme" class="btn btn-outline-secondary btn-sm rounded-pill d-none d-md-flex" :title="isDark ? 'Tema claro' : 'Tema escuro'">
+      
+      <div class="header-actions">
+        <button 
+          @click="toggleTheme" 
+          class="theme-btn" 
+          :title="isDark ? 'Tema claro' : 'Tema escuro'"
+        >
           <i :class="isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill'"></i>
         </button>
-        <button v-if="user?.role === 'CLIENT' || user?.role === 'ADMIN'" @click="openCartDrawer" class="btn btn-outline-preto position-relative d-flex align-items-center justify-content-center rounded-pill px-3" style="min-width:48px; height:44px;">
-          <i class="bi bi-cart3 icon-preto" style="font-size:1.5rem;"></i>
-          <span v-if="cartCount > 0" class="position-absolute badge rounded-pill bg-danger cart-badge-count">{{ cartCount }}</span>
+        
+        <button 
+          v-if="user?.role === 'CLIENT' || user?.role === 'ADMIN'" 
+          @click="openCartDrawer" 
+          class="cart-btn"
+        >
+          <i class="bi bi-cart3 cart-icon"></i>
+          <span v-if="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
         </button>
+        
         <template v-if="isAuth">
-          <div class="dropdown profile-dropdown">
-            <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:44px; height:44px;">
-              <i class="bi bi-person-circle" style="font-size:1.5rem;"></i>
+          <div class="profile-dropdown">
+            <button 
+              class="profile-btn" 
+              @click="toggleProfileMenu"
+              :class="{ 'active': showProfileMenu }"
+            >
+              <i class="bi bi-person-circle"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end mt-2 shadow profile-menu profile-dropdown-custom">
-              <li class="profile-header px-3 py-3 text-center">
-                <div class="profile-name fw-bold mb-1">{{ user?.name || user?.email }}</div>
-                <div class="profile-email small text-muted mb-2">{{ user?.email }}</div>
-                <div class="badge bg-success profile-role">{{ user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'MODERATOR' ? 'Moderador' : 'Cliente' }}</div>
+            <ul v-if="showProfileMenu" class="profile-menu">
+              <li class="profile-header">
+                <div class="profile-name">{{ user?.name || user?.email }}</div>
+                <div class="profile-email">{{ user?.email }}</div>
+                <div class="profile-role">
+                  {{ user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'MODERATOR' ? 'Moderador' : 'Cliente' }}
+                </div>
               </li>
-              <!-- Removido divider para visual mais limpo -->
               <li v-if="user?.role === 'ADMIN'">
-                <router-link class="dropdown-item profile-dropdown-item" to="/admin"><i class="bi bi-speedometer2 me-2"></i> Painel Admin</router-link>
+                <router-link class="profile-item" to="/admin">
+                  <i class="bi bi-speedometer2"></i> Painel Admin
+                </router-link>
               </li>
               <li v-if="user?.role === 'MODERATOR'">
-                <router-link class="dropdown-item profile-dropdown-item" to="/moderador"><i class="bi bi-speedometer2 me-2"></i> Painel Moderador</router-link>
+                <router-link class="profile-item" to="/moderador">
+                  <i class="bi bi-speedometer2"></i> Painel Moderador
+                </router-link>
               </li>
-              <li><router-link class="dropdown-item profile-dropdown-item" to="/perfil"><i class="bi bi-person-lines-fill me-2"></i> Meu Perfil</router-link></li>
-              <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" @click.prevent="goToPerfil">
-                <i class="bi bi-box-seam"></i> Pedidos
-              </a></li>
-              <li><button class="dropdown-item profile-dropdown-item no-hover" @click="logout"><i class="bi bi-box-arrow-right me-2"></i> Sair</button></li>
+              <li>
+                <router-link class="profile-item" to="/perfil">
+                  <i class="bi bi-person-lines-fill"></i> Meu Perfil
+                </router-link>
+              </li>
+              <li>
+                <a class="profile-item" href="#" @click.prevent="goToPerfil">
+                  <i class="bi bi-box-seam"></i> Pedidos
+                </a>
+              </li>
+              <li>
+                <button class="profile-item logout-item" @click="logout">
+                  <i class="bi bi-box-arrow-right"></i> Sair
+                </button>
+              </li>
             </ul>
           </div>
         </template>
+        
         <template v-else>
-          <router-link to="/login" class="btn btn-outline-amarelo rounded-pill px-3">Entrar</router-link>
+          <router-link to="/login" class="login-btn">Entrar</router-link>
         </template>
       </div>
+      
       <CartDrawer :open="cartDrawer.isOpen" @close="cartDrawer.closeDrawer" />
-      <!-- Remover SideMenu -->
-      <!-- <SideMenu :open="showSideMenu" @close="closeSideMenu" /> -->
     </div>
-    <!-- Mobile: só busca -->
-    <!-- Remover busca duplicada mobile -->
-    <!-- <form class="search-bar d-flex d-md-none px-2 mt-2" @submit.prevent="onSearch">
-      <input v-model="searchQuery" type="text" class="form-control rounded-pill px-3" placeholder="Buscar produtos..." aria-label="Buscar produtos" />
-      <button type="submit" class="btn btn-success rounded-pill ms-2 px-3"><i class="bi bi-search"></i></button>
-    </form> -->
-    <!-- Mobile: categorias escondidas -->
   </nav>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import CartDrawer from './CartDrawer.vue'
 import { useCartDrawerStore } from '@/stores/cartDrawer'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
-// Remover imports e lógica do SideMenu
-// import SideMenu from './SideMenu.vue'
-// const showSideMenu = ref(false)
-// function openSideMenu() { showSideMenu.value = true }
-// function closeSideMenu() { showSideMenu.value = false }
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -107,6 +139,7 @@ const cartStore = useCartStore()
 const user = computed(() => auth.user)
 const isAdmin = computed(() => auth.role === 'ADMIN')
 const isAuth = computed(() => !!auth.token)
+const showProfileMenu = ref(false)
 
 const cartCount = computed(() => {
   return Array.isArray(cartStore.items)
@@ -130,10 +163,22 @@ function toggleTheme() {
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
 }
 
-function openCartDrawer() { cartDrawer.openDrawer() }
-function closeCartDrawer() { cartDrawer.closeDrawer() }
+function openCartDrawer() { 
+  cartDrawer.openDrawer() 
+}
 
-// Barra de pesquisa
+function closeCartDrawer() { 
+  cartDrawer.closeDrawer() 
+}
+
+function toggleProfileMenu() {
+  showProfileMenu.value = !showProfileMenu.value
+}
+
+function closeProfileMenu() {
+  showProfileMenu.value = false
+}
+
 const searchQuery = ref('')
 function onSearch() {
   if (searchQuery.value.trim()) {
@@ -142,18 +187,27 @@ function onSearch() {
   }
 }
 
-// Remover o bloco de categories/subcategories e o mock de categories do script.
-
 onMounted(() => {
   cartStore.fetchItems()
-  // Aqui você pode buscar categorias reais da API e atualizar categories.value
+  document.addEventListener('click', handleClickOutside)
 })
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+function handleClickOutside(event) {
+  const dropdown = document.querySelector('.profile-dropdown')
+  if (dropdown && !dropdown.contains(event.target)) {
+    showProfileMenu.value = false
+  }
+}
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-.header-fixed {
+.header-navbar {
   position: sticky;
   top: 0;
   left: 0;
@@ -165,248 +219,425 @@ onMounted(() => {
   transition: all 0.3s ease;
   border-bottom: 1px solid var(--color-border);
   color: #18181b !important;
+  padding: 0.75rem 0;
 }
 
-[data-theme="dark"] .header-fixed {
+.header-dark {
   background: var(--color-bg-header);
   color: var(--color-text-light);
   border-bottom: 1px solid var(--color-border);
 }
-.navbar {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  color: #18181b !important;
+
+.header-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-wrap: wrap;
+  min-height: 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
-.site-title-link {
+
+.header-brand {
   text-decoration: none !important;
   color: #18181b;
-}
-.site-title {
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
   font-size: 1.8rem;
+  letter-spacing: -0.025em;
   transition: color 0.3s ease;
+}
+
+.brand-text {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.brand-preto {
   color: #18181b !important;
 }
-.logo-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  display: block;
+
+.brand-amarelo {
+  color: #FFD600 !important;
 }
-.ms-auto { margin-left: auto !important; }
-.search-bar input[type="text"] {
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-mobile {
+  display: flex;
+  margin-left: 0.5rem;
+  flex-shrink: 1;
+  max-width: 140px;
   min-width: 0;
-  width: 100%;
-  color: #18181b !important;
+  height: 36px;
 }
+
+.search-desktop {
+  display: none;
+  margin: 0 auto;
+  flex-grow: 1;
+  max-width: 340px;
+  min-width: 180px;
+}
+
+.search-input {
+  flex: 1;
+  border: 2px solid #e1e5e9;
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  color: #18181b;
+  transition: all 0.3s ease;
+  min-width: 0;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #FFD600;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.1);
+}
+
+.search-btn {
+  background: #fff;
+  border: 2px solid #e1e5e9;
+  color: #18181b;
+  border-radius: 50px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.1rem;
+  width: 44px;
+  height: 44px;
+}
+
+.search-btn:hover {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+  color: #18181b;
+}
+
+.search-icon {
+  color: #18181b;
+}
+
 .nav-categories {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   gap: 1.2rem;
+  margin-left: 1rem;
 }
-.nav-categories-mobile {
+
+.nav-item {
   list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 1.2rem;
 }
-.nav-categories .nav-link,
-.nav-categories-mobile .nav-link {
+
+.nav-link {
   color: #18181b;
   font-weight: 600;
   font-size: 1.08rem;
-  transition: color 0.2s;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  position: relative;
 }
-.nav-categories .nav-link:hover,
-.nav-categories-mobile .nav-link:hover {
-  color: #222 !important;
+
+.nav-link:hover {
+  color:rgb(0, 0, 0) !important;
+  background: rgba(150, 149, 149, 0.1);
 }
-.header-fixed .btn,
-.header-fixed .profile-btn,
-.header-fixed .dropdown-menu,
-.header-fixed .dropdown-item,
-.header-fixed .badge,
-.header-fixed .form-control,
-.header-fixed .navbar-brand {
-  color: #18181b !important;
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+  position: relative;
+  z-index: 2;
+  padding-right: 0.5rem;
 }
-@media (max-width: 991px) {
-  .nav-categories, .nav-categories-mobile {
-    display: none !important;
-  }
-  .search-bar {
-    margin-top: 0.5rem;
-  }
-  .header-fixed .navbar-brand {
-    font-size: 1.3rem !important;
-    padding-left: 0.2rem;
-  }
-  .header-fixed .btn, .header-fixed .profile-btn {
-    font-size: 1.1rem !important;
-    padding: 0.3rem 0.7rem !important;
-  }
-  .header-fixed .site-title {
-    font-size: 1.3rem !important;
-  }
-  .header-fixed .d-flex.align-items-center {
-    gap: 0.5rem !important;
-  }
-  .search-bar.d-md-none {
-    max-width: 140px !important;
-    min-width: 0 !important;
-    height: 36px !important;
-  }
-  .search-bar.d-md-none input {
-    font-size: 0.98rem !important;
-    height: 32px !important;
-    padding: 0.2rem 0.7rem !important;
-  }
-  .search-bar.d-md-none button {
-    height: 32px !important;
-    font-size: 1.1rem !important;
-    padding: 0.2rem 0.7rem !important;
-  }
-  .navbar-brand {
-    margin-right: 0.3rem !important;
-  }
-}
-@media (max-width: 600px) {
-  .header-fixed .navbar-brand {
-    font-size: 1.1rem !important;
-    padding-left: 0.1rem;
-  }
-  .header-fixed .site-title {
-    font-size: 1.1rem !important;
-  }
-  .header-fixed .btn, .header-fixed .profile-btn {
-    font-size: 1rem !important;
-    padding: 0.2rem 0.5rem !important;
-  }
-}
-.profile-btn {
+
+.theme-btn {
+  background: #fff;
+  border: 2px solid #e1e5e9;
+  color: #6c757d;
+  border-radius: 50px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: none;
   width: 44px;
   height: 44px;
-  font-size: 1.7rem;
-  padding: 0;
-  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-btn:hover {
   background: #f8f9fa;
-  border: 1.5px solid #d1d5db;
-  transition: box-shadow 0.2s, border 0.2s;
+  border-color: #d1d5db;
+  color: #6c757d;
 }
-.profile-btn:focus, .profile-btn:active, .profile-btn:hover {
-  box-shadow: none !important;
-  outline: none !important;
-  background: transparent !important;
-}
-.profile-dropdown .dropdown-menu {
-  min-width: 220px;
-  border-radius: 1rem;
-  border: none;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
-  padding: 0.5rem 0;
-}
-.profile-menu .badge {
-  background: #FFD600 !important;
-  color: #18181b !important;
-  font-weight: 700;
-}
-.profile-menu .dropdown-item {
-  font-size: 1.08rem;
-  border-radius: 0.7rem;
-  transition: background 0.2s;
-}
-.profile-menu .dropdown-item:active, .profile-menu .dropdown-item:focus {
-  background: #e9fbe7;
-  color: #21ba45;
-}
-.btn-outline-amarelo {
-  border: 2px solid #FFD600;
-  color: #18181b !important;
-  background: transparent;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-outline-amarelo:hover, .btn-outline-amarelo:focus {
-  background: #FFD600 !important;
-  color: #18181b !important;
-  border-color: #FFD600 !important;
-}
-.btn-outline-preto {
-  border: 2px solid #18181b;
-  color: #18181b !important;
+
+.cart-btn {
   background: #fff;
-  transition: background 0.2s, color 0.2s;
+  border: 2px solid #e1e5e9;
+  color: #18181b;
+  border-radius: 50px;
+  padding: 0.5rem 0.75rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
-.btn-outline-preto:hover, .btn-outline-preto:focus {
-  background: #fff !important;
-  color: #18181b !important;
-  border-color: #18181b !important;
+
+.cart-btn:hover {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+  color: #18181b;
 }
-.icon-preto {
-  color: #18181b !important;
+
+.cart-icon {
+  font-size: 1.5rem;
+  color: #18181b;
 }
-/* Badge de contagem do carrinho */
-.cart-badge-count {
+
+.cart-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #dc3545;
+  color: #fff;
   font-size: 0.78rem;
   min-width: 16px;
   height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  left: 36px !important;
-  top: 2px !important;
-  z-index: 2;
-  border: 1.5px solid #ecae27;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   padding: 0 2px;
-  margin: 0 !important;
 }
-/* Mini modal de perfil mais bonito */
-.profile-dropdown-custom {
-  min-width: 220px;
-  border-radius: 16px;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  width: 44px;
+  height: 44px;
   background: #fff;
+  border: 2px solid #e1e5e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+  font-size: 1.5rem;
+  color: #18181b;
+  outline: none;
 }
+
+.profile-btn:hover,
+.profile-btn.active,
+.profile-btn:focus {
+  background: #f5f5f5;
+  border-color: #bdbdbd;
+  color: #18181b;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 0.5rem 0;
+  min-width: 210px;
+  list-style: none;
+  z-index: 1000;
+  border: 1px solid #e1e5e9;
+}
+
 .profile-header {
+  padding: 0.9rem 1rem 0.7rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
   margin-bottom: 0.2rem;
-  border-bottom: none;
+  background: #fafafa;
+  border-radius: 12px 12px 0 0;
 }
+
 .profile-name {
-  font-size: 1.13rem;
-  color: #222;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 1.08rem;
+  color: #18181b;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
 }
+
 .profile-email {
   color: #888;
   font-size: 0.97rem;
+  margin-bottom: 0.3rem;
 }
+
 .profile-role {
+  color: #888;
   font-size: 0.92rem;
-  margin-top: 0.2rem;
+  font-weight: 400;
+  margin-top: 0.1rem;
 }
-/* Itens do dropdown de perfil com hover igual */
-.profile-dropdown-item {
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  color: #18181b;
+  text-decoration: none;
+  font-size: 1.04rem;
+  border-radius: 6px;
   transition: background 0.18s, color 0.18s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
 }
-.profile-dropdown-item:hover, .profile-dropdown-item:focus {
-  background: #f7f7f7 !important;
-  color: #f5aa1e !important;
+
+.profile-item:hover,
+.profile-item:focus {
+  background: #f5f5f5;
+  color: #18181b;
 }
-/* Botão 'Sair' com mesmo hover dos outros itens, sem movimento */
-.no-hover:hover, .no-hover:focus {
-  background: #f7f7f7 !important;
-  color: #f5aa1e !important;
-  transition: background 0.18s, color 0.18s;
-  outline: none !important;
-  box-shadow: none !important;
-  transform: none !important;
+
+.logout-item {
+  color: #888;
+}
+
+.logout-item:hover {
+  background: #f5f5f5;
+  color: #18181b;
+}
+
+.login-btn {
+  background: #fff;
+  border: 2px solid #e1e5e9;
+  color: #18181b;
+  border-radius: 50px;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+}
+
+.login-btn:hover {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+  color: #18181b;
+}
+
+@media (min-width: 768px) {
+  .theme-btn {
+    display: flex;
+  }
+  
+  .search-desktop {
+    display: flex;
+  }
+  
+  .search-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .nav-categories {
+    display: none !important;
+  }
+  
+  .header-brand {
+    font-size: 1.3rem !important;
+    padding-left: 0.2rem;
+  }
+  
+  .header-actions {
+    gap: 0.15rem !important;
+  }
+  
+  .search-mobile {
+    max-width: 140px !important;
+    min-width: 0 !important;
+    height: 36px !important;
+  }
+  
+  .search-mobile .search-input {
+    font-size: 0.98rem !important;
+    height: 32px !important;
+    padding: 0.2rem 0.7rem !important;
+  }
+  
+  .search-mobile .search-btn {
+    height: 32px !important;
+    font-size: 1.1rem !important;
+    padding: 0.2rem 0.7rem !important;
+  }
+  
+  .header-brand {
+    margin-right: 0.3rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-brand {
+    font-size: 1.1rem !important;
+    padding-left: 0.1rem;
+  }
+  
+  .header-actions {
+    gap: 0.1rem !important;
+    padding-right: 0.25rem;
+  }
+  
+  .cart-btn,
+  .profile-btn,
+  .theme-btn,
+  .login-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem !important;
+  }
+  
+  .cart-icon {
+    font-size: 1.3rem;
+  }
 }
 </style> 

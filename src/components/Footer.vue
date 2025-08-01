@@ -1,18 +1,16 @@
 <template>
-  <footer class="footer-minimal text-center py-3 mt-5">
-    <div class="container">
-      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
-        <div class="footer-brand-minimal fw-bold">3C <span class="text-amarelo">sports</span> &copy; 2024</div>
-        <div class="footer-links-minimal d-flex gap-3">
-          <a href="#produtos" class="footer-link-minimal">Times</a>
-          <a href="#" class="footer-link-minimal">Promoções</a>
-          <a href="#" class="footer-link-minimal">Contato</a>
-        </div>
-        <div class="footer-social-minimal d-flex gap-2">
-          <a href="#" class="social-link-minimal" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-          <a href="#" class="social-link-minimal" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="social-link-minimal" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-        </div>
+  <footer class="footer-minimal">
+    <div class="footer-container">
+      <div class="footer-brand-minimal">3C <span class="text-amarelo">sports</span> &copy; 2024</div>
+      <div class="footer-links-minimal">
+        <a href="#produtos" class="footer-link-minimal">Times</a>
+        <a href="#" class="footer-link-minimal">Promoções</a>
+        <a href="#" class="footer-link-minimal">Contato</a>
+      </div>
+      <div class="footer-social-minimal">
+        <a href="#" class="social-link-minimal" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="social-link-minimal" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="social-link-minimal" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
       </div>
     </div>
   </footer>
@@ -29,11 +27,23 @@
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   font-size: 0.98rem;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.02);
+  padding: 24px 0 18px 0;
+}
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 1.5rem;
 }
 .footer-brand-minimal {
   font-size: 1.08rem;
   letter-spacing: -0.01em;
   color: #18181b;
+  font-weight: 700;
 }
 .footer-links-minimal {
   display: flex;
@@ -76,6 +86,12 @@
   .footer-minimal {
     font-size: 0.93rem;
     padding: 18px 0 !important;
+  }
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0 0.7rem;
   }
   .footer-brand-minimal {
     font-size: 0.97rem;

@@ -1,61 +1,70 @@
 <template>
-  <div class="product-detail-loja container-fluid py-5 d-flex flex-column align-items-center justify-content-center">
-    <div class="row justify-content-center align-items-start gx-5 gy-4 w-100 product-detail-row-wide" style="max-width: 1400px;">
-      <div class="col-12 col-lg-6 d-flex flex-column align-items-center align-items-lg-end justify-content-start mb-4 mb-lg-0">
-        <div class="img-box-loja visual-box position-relative w-100 d-flex align-items-center justify-content-center justify-content-lg-end">
-          <img :src="getImage(product.image_path)" :alt="product.name" class="product-image-loja shadow-sm" />
-          <img v-if="product.escudo" :src="product.escudo" alt="Escudo" class="escudo-loja position-absolute top-0 start-0 m-3 bg-white rounded-circle border border-success p-1" />
-          <span v-if="product.oficial" class="badge bg-success position-absolute top-0 end-0 m-3 fs-6 py-2 px-3 rounded-pill">Oficial</span>
+  <div class="product-detail-container">
+    <div class="product-detail-content">
+      <div class="product-image-section">
+        <div class="image-container">
+          <img :src="getImage(product.image_path)" :alt="product.name" class="product-image" />
+          <img v-if="product.escudo" :src="product.escudo" alt="Escudo" class="team-badge" />
+          <span v-if="product.oficial" class="official-badge">Oficial</span>
         </div>
-        <div v-if="relatedProducts.length" class="order-bump-box-similar w-100 mt-4">
-          <div class="order-bump-title-similar fw-bold mb-3 text-center">
+        
+        <div v-if="relatedProducts.length" class="related-products">
+          <div class="related-title">
             Itens semelhantes para você
           </div>
-          <div class="order-bump-carousel d-flex align-items-center justify-content-center gap-3">
-            <button class="carousel-arrow-similar left" @click="prevRelated" :disabled="relatedIndex === 0" aria-label="Anterior">
+          <div class="related-carousel">
+            <button class="carousel-arrow left" @click="prevRelated" :disabled="relatedIndex === 0" aria-label="Anterior">
               <i class="bi bi-arrow-left-circle"></i>
             </button>
-            <div class="order-bump-card-wrapper visual-box">
+            <div class="related-card-wrapper">
               <ProductCard :product="relatedProducts[relatedIndex]" :showCartBtn="true" @add-to-cart="addRelatedToCart" />
             </div>
-            <button class="carousel-arrow-similar right" @click="nextRelated" :disabled="relatedIndex === relatedProducts.length - 1" aria-label="Próximo">
+            <button class="carousel-arrow right" @click="nextRelated" :disabled="relatedIndex === relatedProducts.length - 1" aria-label="Próximo">
               <i class="bi bi-arrow-right-circle"></i>
             </button>
           </div>
         </div>
       </div>
-      <div class="col-12 col-lg-6 d-flex align-items-center align-items-lg-start justify-content-center justify-content-lg-start">
-        <div class="info-box-loja w-100 d-flex flex-column align-items-center align-items-lg-start justify-content-center justify-content-lg-start visual-box">
-          <h1 class="fw-bold mb-2 nome-produto-loja text-center align-title-desktop">{{ product.name }}</h1>
-          <div class="precos-loja mb-3 justify-content-center flex-column align-items-center text-center visual-box">
-            <span class="preco-antigo-loja mb-1" v-if="precoAntigo">De <span>R$ {{ Number(precoAntigo).toFixed(2) }}</span></span>
-            <span class="parcela-loja mb-1">12x de <b class="valor-parcela">R$ {{ parcela12x }}</b> <span class="sem-juros-verde">sem juros</span></span>
-            <span class="preco-promocional-loja mb-1">ou <b>R$ {{ Number(product.price).toFixed(2) }}</b> à vista</span>
+      
+      <div class="product-info-section">
+        <div class="info-container">
+          <h1 class="product-name">{{ product.name }}</h1>
+          
+          <div class="price-section">
+            <span class="old-price" v-if="precoAntigo">De <span>R$ {{ Number(precoAntigo).toFixed(2) }}</span></span>
+            <span class="installment-price">12x de <b class="installment-value">R$ {{ parcela12x }}</b> <span class="no-interest">sem juros</span></span>
+            <span class="cash-price">ou <b>R$ {{ Number(product.price).toFixed(2) }}</b> à vista</span>
           </div>
-          <div class="divider-loja mb-3"></div>
-          <div class="tamanhos-loja mb-4 w-100 d-flex flex-column align-items-center visual-box">
-            <div class="tamanhos-label-loja">Tamanho:</div>
-            <div class="tamanhos-list-loja justify-content-center">
-              <button v-for="size in sizes" :key="size" type="button" class="btn-tamanho-loja btn-tamanho-pequeno" :class="{ active: selectedSize === size }" @click="selectedSize = size">{{ size }}</button>
+          
+          <div class="divider"></div>
+          
+          <div class="size-section">
+            <div class="size-label">Tamanho:</div>
+            <div class="size-buttons">
+              <button v-for="size in sizes" :key="size" type="button" class="size-btn" :class="{ active: selectedSize === size }" @click="selectedSize = size">{{ size }}</button>
             </div>
           </div>
-          <button @click="addToCart" class="btn btn-comprar-loja w-100 mb-4">
-            <span v-if="!showMsg"><i class="bi bi-cart-plus me-2"></i>Adicionar ao carrinho</span>
-            <span v-else class="fadein">Adicionado! <i class="bi bi-check-circle ms-2"></i></span>
+          
+          <button @click="addToCart" class="add-cart-btn">
+            <span v-if="!showMsg"><i class="bi bi-cart-plus"></i>Adicionar ao carrinho</span>
+            <span v-else class="success-message">Adicionado! <i class="bi bi-check-circle"></i></span>
           </button>
-          <div class="garantia-loja mb-2 justify-content-center text-center visual-box">
-            <i class="bi bi-shield-lock me-2"></i> <b>Compra 100% Segura</b> &mdash; Satisfação garantida ou seu dinheiro de volta!
+          
+          <div class="guarantee-info">
+            <i class="bi bi-shield-lock"></i> <b>Compra 100% Segura</b> &mdash; Satisfação garantida ou seu dinheiro de volta!
           </div>
-          <div class="pagamento-loja mb-2 justify-content-center text-center visual-box">
-            <span class="pagamento-label-loja">Aceitamos:</span>
+          
+          <div class="payment-info">
+            <span class="payment-label">Aceitamos:</span>
             <i class="bi bi-credit-card"></i>
             <i class="bi bi-cash-coin"></i>
             <i class="bi bi-bank"></i>
-            <span class="pix-badge-loja">PIX</span>
-            <span class="boleto-badge-loja">Boleto</span>
+            <span class="pix-badge">PIX</span>
+            <span class="boleto-badge">Boleto</span>
           </div>
-          <div class="entrega-loja mb-2 justify-content-center text-center visual-box">
-            <i class="bi bi-truck me-2"></i> <span>Envio rápido para todo o Brasil</span>
+          
+          <div class="delivery-info">
+            <i class="bi bi-truck"></i> <span>Envio rápido para todo o Brasil</span>
           </div>
         </div>
       </div>
@@ -111,6 +120,7 @@ const precoAntigo = computed(() => {
   if (!product.value.price) return null
   return (Number(product.value.price) * 1.38).toFixed(2)
 })
+
 const parcela12x = computed(() => {
   if (!product.value.price) return '0,00'
   return (Number(product.value.price) / 12).toFixed(2)
@@ -149,14 +159,16 @@ async function addRelatedToCart(produto) {
 function prevRelated() {
   if (relatedIndex.value > 0) relatedIndex.value--
 }
+
 function nextRelated() {
   if (relatedIndex.value < relatedProducts.value.length - 1) relatedIndex.value++
 }
+
 watch(relatedProducts, () => { relatedIndex.value = 0 })
 </script>
 
 <style scoped>
-.product-detail-loja {
+.product-detail-container {
   background: #fff;
   border-radius: 2rem;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
@@ -169,7 +181,28 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   align-items: center;
   justify-content: flex-start;
 }
-.img-box-loja {
+
+.product-detail-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.product-image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  max-width: 600px;
+}
+
+.image-container {
   background: #f7f7f7;
   border-radius: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
@@ -180,10 +213,11 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  margin: 0 auto 0 auto;
+  margin: 0 auto;
   position: relative;
 }
-.product-image-loja {
+
+.product-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -192,16 +226,43 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   background: #fff;
   margin-top: 0;
 }
-.img-box-loja:hover .product-image-loja {
-  /* Removido efeito de zoom e rotação no hover */
-}
-.escudo-loja {
+
+.team-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
   width: 54px;
   height: 54px;
-  z-index: 2;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid #28a745;
+  padding: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  z-index: 2;
 }
-.info-box-loja {
+
+.official-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #28a745;
+  color: #fff;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(40,167,69,0.2);
+  z-index: 2;
+}
+
+.product-info-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  max-width: 600px;
+}
+
+.info-container {
   background: #fff;
   border-radius: 1.2rem;
   box-shadow: 0 2px 12px rgba(24,24,27,0.04);
@@ -214,199 +275,191 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   align-items: center;
   justify-content: flex-start;
 }
-.garantia-loja, .pagamento-loja, .entrega-loja {
-  width: 100%;
-  text-align: center;
-  justify-content: center !important;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-.nome-produto-loja {
+
+.product-name {
   font-size: 2.1rem;
   font-weight: 900;
   color: #18181b;
   margin-bottom: 0.7rem;
+  text-align: center;
 }
-.precos-loja {
+
+.price-section {
   display: flex;
-  align-items: baseline;
-  gap: 1.1rem;
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
-.preco-antigo-loja {
+
+.old-price {
   color: #e60014;
   text-decoration: line-through;
   font-size: 1.13rem;
-  margin-bottom: 0.2rem;
-  display: block;
   font-weight: 700;
 }
-.preco-promocional-loja {
-  color: #18181b;
-  font-size: 1.13rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  display: block;
-}
-.parcela-loja {
+
+.installment-price {
   color: #18181b;
   font-size: 2.3rem;
   font-weight: 900;
-  margin-bottom: 0.2rem;
-  display: block;
 }
-.valor-parcela {
+
+.installment-value {
   color: #1db954;
   font-size: 2.3rem;
   font-weight: 900;
 }
-.sem-juros-verde {
+
+.no-interest {
   color: #18181b;
   font-weight: 700;
 }
-.divider-loja {
+
+.cash-price {
+  color: #18181b;
+  font-size: 1.13rem;
+  font-weight: 700;
+}
+
+.divider {
   width: 100%;
   height: 1px;
   background: #ececec;
-  margin: 0.7rem 0 1.1rem 0;
+  margin: 16px 0 20px 0;
   border-radius: 2px;
 }
-.tamanhos-loja {
-  margin-bottom: 0.7rem;
+
+.size-section {
+  margin-bottom: 16px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.tamanhos-label-loja {
+
+.size-label {
   font-weight: 700;
-  margin-bottom: 0.2rem;
+  margin-bottom: 8px;
   color: #18181b;
 }
-.tamanhos-list-loja {
+
+.size-buttons {
   display: flex;
-  gap: 1.1rem;
-  margin-top: 0.2rem;
+  gap: 16px;
+  margin-top: 8px;
 }
-.btn-tamanho-loja {
+
+.size-btn {
   background: #fff;
   border: 2.5px solid #18181b;
   color: #18181b;
   font-weight: 800;
   border-radius: 14px;
-  padding: 0.7rem 1.7rem;
+  padding: 12px 24px;
   font-size: 1.18rem;
   cursor: pointer;
   transition: background 0.18s, color 0.18s, border 0.18s;
   box-shadow: 0 1px 4px rgba(24,24,27,0.04);
 }
-.btn-tamanho-loja.active, .btn-tamanho-loja:hover {
+
+.size-btn.active, .size-btn:hover {
   background: #18181b;
   color: #fff;
   border-color: #18181b;
 }
-.btn-comprar-loja {
+
+.add-cart-btn {
   background: #18181b;
   color: #FFD600;
   font-size: 1.35rem;
   font-weight: 900;
   border: none;
   border-radius: 18px;
-  padding: 1.2rem 2.7rem;
-  margin-top: 0.7rem;
+  padding: 20px 40px;
+  margin-top: 16px;
   box-shadow: 0 2px 8px rgba(24,24,27,0.10);
   transition: background 0.18s, color 0.18s;
   display: flex;
   align-items: center;
   justify-content: center;
   letter-spacing: 0.01em;
+  cursor: pointer;
+  width: 100%;
 }
-.btn-comprar-loja:hover {
+
+.add-cart-btn:hover {
   background: #18181b;
   color: #FFD600;
 }
-.visual-box {
-  border: 2.5px solid #ececec;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(24,24,27,0.07);
-  background: #fff;
-  margin-bottom: 1.2rem;
-  padding: 1.2rem 1rem;
+
+.add-cart-btn i {
+  margin-right: 8px;
 }
-.garantia-loja {
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guarantee-info, .payment-info, .delivery-info {
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.guarantee-info {
   color: #18181b;
   font-size: 1.13rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
-.pagamento-loja {
+
+.payment-info {
   font-size: 1.13rem;
   color: #18181b;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
+  gap: 12px;
 }
-.pagamento-label-loja {
+
+.payment-label {
   font-weight: 700;
-  margin-right: 0.5rem;
+  margin-right: 8px;
 }
-.pix-badge-loja {
+
+.pix-badge {
   background: #18181b;
   color: #FFD600;
   border-radius: 8px;
-  padding: 2px 10px;
+  padding: 4px 12px;
   font-size: 1.05rem;
-  margin-left: 0.3rem;
   font-weight: 700;
 }
-.boleto-badge-loja {
+
+.boleto-badge {
   background: #FFD600;
   color: #18181b;
   border-radius: 8px;
-  padding: 2px 10px;
+  padding: 4px 12px;
   font-size: 1.05rem;
-  margin-left: 0.3rem;
   font-weight: 700;
 }
-.entrega-loja {
+
+.delivery-info {
   color: #18181b;
   font-size: 1.13rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
-.order-bump-box {
-  background: #fffbe6;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 12px rgba(255,214,0,0.08);
-  padding: 1.2rem 1rem 1.2rem 1rem;
-  margin-top: 1.2rem;
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.order-bump-title {
-  font-size: 1.13rem;
-  color: #18181b;
-  letter-spacing: 0.01em;
-}
-.order-bump-list {
-  width: 100%;
-  overflow-x: auto;
-  gap: 1.2rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
-.order-bump-box-similar {
+
+.related-products {
   background: #fff;
   border-radius: 1.2rem;
   box-shadow: 0 2px 16px rgba(24,24,27,0.07);
-  padding: 2rem 1.2rem 1.2rem 1.2rem;
-  margin-top: 1.2rem;
+  padding: 32px 20px 20px 20px;
+  margin-top: 20px;
   width: 100%;
   max-width: 100%;
   display: flex;
@@ -414,33 +467,29 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   align-items: center;
   border: none;
 }
-.order-bump-title-similar {
+
+.related-title {
   font-size: 1.25rem;
   color: #18181b;
   letter-spacing: 0.01em;
-  margin-bottom: 1.2rem;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 8px;
+  font-weight: 700;
 }
-.order-bump-list-similar {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  justify-content: center;
-  align-items: stretch;
-}
-.order-bump-carousel {
+
+.related-carousel {
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 1.2rem;
+  gap: 20px;
 }
-.order-bump-card-wrapper {
+
+.related-card-wrapper {
   min-width: 240px;
   max-width: 320px;
   width: 100%;
@@ -448,7 +497,8 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   align-items: stretch;
   justify-content: center;
 }
-.carousel-arrow-similar {
+
+.carousel-arrow {
   background: transparent;
   border: none;
   color: #18181b;
@@ -458,133 +508,96 @@ watch(relatedProducts, () => { relatedIndex.value = 0 })
   justify-content: center;
   transition: none;
   cursor: pointer;
-  padding: 0 0.2rem;
+  padding: 0 4px;
 }
-.carousel-arrow-similar:disabled {
+
+.carousel-arrow:disabled {
   color: #ececec;
   cursor: not-allowed;
 }
-.carousel-arrow-similar:hover,
-.carousel-arrow-similar:focus {
+
+.carousel-arrow:hover,
+.carousel-arrow:focus {
   color: #18181b;
   background: transparent;
 }
-.btn-tamanho-pequeno {
-  padding: 0.35rem 0.9rem;
-  font-size: 0.98rem;
-  border-radius: 10px;
-}
-.product-detail-row-wide {
-  max-width: 1400px !important;
-  margin-left: auto;
-  margin-right: auto;
-}
+
 @media (min-width: 1200px) {
-  .img-box-loja {
+  .image-container {
     max-width: 520px;
     height: 520px;
   }
-  .info-box-loja {
+  
+  .info-container {
     max-width: 540px;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
   }
 }
-@media (max-width: 900px) {
-  .product-detail-row-wide {
-    max-width: 100vw !important;
+
+@media (max-width: 991px) {
+  .product-detail-content {
+    flex-direction: column;
+    gap: 20px;
   }
-  .img-box-loja {
+  
+  .product-image-section {
+    max-width: 100%;
+  }
+  
+  .product-info-section {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .product-detail-container {
+    padding: 18px 4px;
+    border-radius: 1.2rem;
+  }
+  
+  .image-container {
     max-width: 320px;
     height: 260px;
   }
-  .info-box-loja {
+  
+  .info-container {
     max-width: 100vw;
     padding-left: 0.7rem;
     padding-right: 0.7rem;
   }
-  .product-detail-loja {
-    padding: 18px 4px;
-    border-radius: 1.2rem;
-  }
-  .img-box-loja {
-    height: 260px;
-    max-width: 100vw;
-    max-width: 320px;
-    margin-bottom: 0;
-  }
-  .product-image-loja {
-    height: 260px;
-  }
-  .info-box-loja {
-    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
-    max-width: 100vw;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  .nome-produto-loja {
+  
+  .product-name {
     font-size: 1.3rem;
   }
-  .btn-comprar-loja {
+  
+  .add-cart-btn {
     font-size: 1rem;
-    padding: 0.8rem 1.2rem;
+    padding: 16px 20px;
   }
-  .order-bump-box {
-    max-width: 100vw;
-    padding: 0.7rem 0.2rem;
+  
+  .related-products {
+    padding: 16px 4px;
   }
-  .order-bump-list {
-    flex-direction: row;
-    gap: 0.7rem;
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .order-bump-box-similar {
-    padding: 1rem 0.2rem;
-  }
-  .order-bump-list-similar {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .order-bump-card-wrapper {
+  
+  .related-card-wrapper {
     min-width: 90vw;
     max-width: 98vw;
   }
-  .order-bump-carousel {
-    gap: 0.5rem;
+  
+  .related-carousel {
+    gap: 8px;
   }
 }
+
 @media (max-width: 600px) {
-  .img-box-loja {
+  .image-container {
     height: 180px;
-    max-width: 100vw;
     max-width: 220px;
   }
-  .product-image-loja {
-    height: 180px;
-  }
-  .info-box-loja {
-    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
-  }
-}
-/* Adicionar alinhamento do título com a imagem no desktop */
-@media (min-width: 992px) {
-  .row.justify-content-center.align-items-start.gx-5.gy-4.w-100 {
-    align-items: flex-start !important;
-  }
-  .nome-produto-loja.align-title-desktop {
-    margin-top: 0;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    min-height: 60px;
-    /* Ajuste fino para alinhar com a imagem */
-    position: relative;
-    top: -60px;
-  }
-  .info-box-loja {
-    margin-top: 60px;
+  
+  .info-container {
+    padding: 12px 4px 12px 4px;
   }
 }
 </style> 

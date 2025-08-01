@@ -1,19 +1,15 @@
 <template>
   <section class="depoimentos">
-    <h2 class="fw-bold text-center mb-4">O que falam sobre nós</h2>
-    <div class="container">
-      <div class="row justify-content-center gap-4">
-        <div class="col-12 col-md-4" v-for="depo in depoimentos" :key="depo.nome">
-          <div class="depo-card p-4 rounded-4 shadow-lg h-100 bg-white border border-warning-subtle position-relative">
-            <div class="depo-stars text-warning mb-2 d-flex align-items-center justify-content-center" style="font-size:1.35rem;">
-              <i class="bi bi-star-fill me-1" v-for="n in 5" :key="n"></i>
-            </div>
-            <div class="depo-text mb-3 text-center fs-5 fst-italic">"{{ depo.texto }}"</div>
-            <div class="depo-nome fw-bold mb-1 text-center">{{ depo.nome }}</div>
-            <div class="depo-data text-muted mb-0 text-center small">{{ depo.data }}</div>
-            <span class="badge bg-warning text-dark position-absolute top-0 end-0 mt-2 me-2">Avaliação verificada</span>
-          </div>
+    <h2 class="depo-title">O que falam sobre nós</h2>
+    <div class="depoimentos-grid">
+      <div class="depo-card" v-for="depo in depoimentos" :key="depo.nome">
+        <div class="depo-stars">
+          <i class="bi bi-star-fill" v-for="n in 5" :key="n"></i>
         </div>
+        <div class="depo-text">"{{ depo.texto }}"</div>
+        <div class="depo-nome">{{ depo.nome }}</div>
+        <div class="depo-data">{{ depo.data }}</div>
+        <span class="depo-badge">Avaliação verificada</span>
       </div>
     </div>
   </section>
@@ -36,36 +32,90 @@ const depoimentos = [
   box-shadow: 0 2px 16px rgba(24,24,27,0.06);
   padding: 2.5rem 0 2rem 0;
 }
+.depo-title {
+  font-weight: 700;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #18181b;
+}
+.depoimentos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+  align-items: stretch;
+  padding: 0 1.5rem;
+}
 .depo-card {
   background: #fff;
   border: 2px solid #FFD60033;
   color: #18181b;
   min-height: 240px;
   box-shadow: 0 4px 24px rgba(24,24,27,0.08);
-  transition: box-shadow 0.2s, border 0.2s;
+  border-radius: 1rem;
+  padding: 2rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
+  transition: box-shadow 0.2s, border 0.2s;
 }
 .depo-card:hover {
   box-shadow: 0 8px 32px rgba(24,24,27,0.14);
   border: 2px solid #FFD600;
 }
-.depo-nome {
-  font-size: 1.1rem;
-}
-.depo-data {
-  font-size: 0.95rem;
+.depo-stars {
+  color: #FFD600;
+  margin-bottom: 0.7rem;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 .depo-text {
   font-size: 1.15rem;
   font-style: italic;
+  text-align: center;
+  margin-bottom: 1.1rem;
 }
-.depo-stars i {
-  font-size: 1.35rem;
+.depo-nome {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  text-align: center;
 }
-.badge.bg-warning {
+.depo-data {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 0.2rem;
+  text-align: center;
+}
+.depo-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #fffbe6;
+  color: #bfa900;
   font-size: 0.85rem;
   font-weight: 600;
   border-radius: 0.7rem;
   box-shadow: 0 1px 4px rgba(255,214,0,0.10);
+  padding: 4px 12px;
+  border: 1px solid #FFD60033;
+}
+@media (max-width: 700px) {
+  .depo-title {
+    font-size: 1.3rem;
+  }
+  .depoimentos-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding: 0 0.5rem;
+  }
+  .depo-card {
+    padding: 1.2rem 0.7rem 0.7rem 0.7rem;
+  }
 }
 </style> 

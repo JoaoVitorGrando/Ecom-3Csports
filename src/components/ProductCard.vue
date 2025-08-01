@@ -1,27 +1,31 @@
 <template>
-  <div class="product-card card border-0 h-100 p-2" @click="goToDetails" style="cursor:pointer;">
-    <img :src="getImage(product.image_path)" :alt="product.name" class="card-img-top object-fit-cover rounded-4 mb-3" style="height: 200px;" />
-    <div class="position-absolute top-0 start-0 m-3">
-      <img v-if="product.escudo" :src="product.escudo" alt="Escudo" style="width:40px;height:40px;" class="bg-white rounded-circle border border-success p-1 shadow" />
-      <span v-if="activeDiscount" class="badge badge-desconto position-absolute top-0 start-0 fs-6 py-2 px-3 rounded-pill shadow">-{{ Number(activeDiscount.discount_percentage).toFixed(0) }}%</span>
-    </div>
-    <span v-if="product.oficial" class="badge bg-success position-absolute top-0 end-0 m-3 fs-6 py-2 px-3 rounded-pill shadow">Oficial</span>
-    <!-- Ícone de detalhes -->
-    <button class="btn-detalhes-icon position-absolute top-0 end-0 m-3" @click.stop="goToDetails" title="Ver detalhes">
-      <i class="bi bi-search fs-5 icon-preto"></i>
-    </button>
-    <!-- Remover bloco de exibição de tags e referências ao useTagsStore/productTags. -->
-    <div class="card-body d-flex flex-column align-items-center p-0">
-      <h5 class="card-title fw-bold text-center mb-2">{{ product.name }}</h5>
-      <div class="precos-produto mb-3">
-        <span v-if="activeDiscount" class="preco-original me-2">R$ {{ Number(product.price).toFixed(2) }}</span>
-        <span class="preco-final text-success fw-semibold fs-4">
-          R$ {{ precoComDesconto }}
-        </span>
+  <div class="product-card" @click="goToDetails">
+    <div class="product-image-container">
+      <img :src="getImage(product.image_path)" :alt="product.name" class="product-image" />
+      
+      <div class="product-badges">
+        <img v-if="product.escudo" :src="product.escudo" alt="Escudo" class="team-badge" />
+        <span v-if="activeDiscount" class="discount-badge">-{{ Number(activeDiscount.discount_percentage).toFixed(0) }}%</span>
       </div>
-      <div class="d-flex w-100 gap-2 mt-auto">
-        <button v-if="showCartBtn" @click.stop="$emit('add-to-cart', product)" class="btn btn-outline-preto flex-grow-1 fw-bold rounded-pill shadow" title="Adicionar ao carrinho">
-          <i class="bi bi-cart-plus fs-5 icon-preto"></i>
+      
+      <span v-if="product.oficial" class="official-badge">Oficial</span>
+      
+      <button class="details-btn" @click.stop="goToDetails" title="Ver detalhes">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+    
+    <div class="product-content">
+      <h5 class="product-title">{{ product.name }}</h5>
+      
+      <div class="price-container">
+        <span v-if="activeDiscount" class="original-price">R$ {{ Number(product.price).toFixed(2) }}</span>
+        <span class="final-price">R$ {{ precoComDesconto }}</span>
+      </div>
+      
+      <div class="action-buttons">
+        <button v-if="showCartBtn" @click.stop="$emit('add-to-cart', product)" class="add-cart-btn" title="Adicionar ao carrinho">
+          <i class="bi bi-cart-plus"></i>
         </button>
       </div>
     </div>
@@ -31,20 +35,24 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+
 const props = defineProps({
   product: Object,
   showCartBtn: { type: Boolean, default: false }
 })
+
 const router = useRouter()
+
 function getImage(path) {
   if (!path) return '/default-product.png'
   if (path.startsWith('http')) return path
   return 'http://35.196.79.227:8000' + path
 }
+
 function goToDetails() {
   router.push({ name: 'detalhe-produto', params: { id: props.product.id } })
 }
-// Badge de desconto ativo
+
 const activeDiscount = computed(() => {
   if (!props.product.discounts || !props.product.discounts.length) return null
   const now = new Date()
@@ -54,6 +62,7 @@ const activeDiscount = computed(() => {
     return start <= now && now <= end
   })
 })
+
 const precoComDesconto = computed(() => {
   if (!activeDiscount.value) return Number(props.product.price).toFixed(2)
   const desconto = Number(activeDiscount.value.discount_percentage) || 0
@@ -80,77 +89,67 @@ const precoComDesconto = computed(() => {
   position: relative;
   border: 1px solid var(--color-border);
   overflow: hidden;
+  cursor: pointer;
+  padding: 8px;
 }
 
-.product-card:hover {
-  border: 2px solid var(--color-primary);
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--color-shadow-hover);
-}
-.card-img-top.object-fit-cover {
-  object-fit: cover;
+.product-image-container {
+  position: relative;
   width: 100%;
-  height: 200px !important;
-  border-radius: 16px 16px 0 0;
+  height: 200px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
   transition: transform 0.3s ease;
 }
 
-.product-card:hover .card-img-top.object-fit-cover {
+.product-card:hover .product-image {
   transform: scale(1.05);
 }
-.card-body {
-  flex: 1 1 auto;
-  width: 100%;
+
+.product-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1.1rem 1rem 0.7rem 1rem;
+  gap: 8px;
+  z-index: 2;
 }
-.card-title {
-  font-size: 1.18rem;
-  min-height: 48px;
-  margin-bottom: 0.5rem;
+
+.team-badge {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid #28a745;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.card-text {
-  font-size: 1.08rem;
-  margin-bottom: 0.7rem;
+
+.discount-badge {
+  background: #ff1744;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 8px 12px;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(255,23,68,0.13);
+  z-index: 4;
 }
-.d-flex.w-100.gap-2.mt-auto {
-  margin-top: auto !important;
-  width: 100%;
-  gap: 0.7rem !important;
-  display: flex;
-  justify-content: center;
-}
-.btn {
-  font-size: 1rem;
-  padding: 0.7rem 1.1rem;
-  border-radius: 2rem;
-}
-.tag-badge {
-  font-size: 0.78rem;
-  padding: 2px 10px;
-  border-radius: 8px;
-  opacity: 0.85;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  margin-bottom: 2px;
-}
-.btn-outline-preto {
-  border: 2px solid #18181b;
-  color: #18181b !important;
-  background: transparent;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-outline-preto:hover, .btn-outline-preto:focus {
-  background: #fff !important;
-  color: #18181b !important;
-  border-color: #18181b !important;
-}
-.icon-preto {
-  color: #18181b !important;
-}
-.btn-detalhes-icon {
+
+
+.details-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   background: #fff;
   border: 1.5px solid #18181b;
   color: #18181b;
@@ -160,62 +159,125 @@ const precoComDesconto = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(24,24,27,0.10);
+  box-shadow: 0 2px 8px rgba(179, 179, 179, 0.1);
   transition: background 0.18s, color 0.18s, border 0.18s;
   z-index: 3;
   font-size: 1.2rem;
   padding: 0;
+  cursor: pointer;
 }
-.btn-detalhes-icon:hover {
-  background: #fff;
-  color: #18181b;
-  border-color: #18181b;
-}
-.badge-desconto {
-  background: #ff1744;
-  color: #fff;
+
+
+.product-title {
+  font-size: 1.18rem;
   font-weight: 700;
-  font-size: 1.05rem;
-  box-shadow: 0 2px 8px rgba(255,23,68,0.13);
-  z-index: 4;
-  left: 0;
-  top: 0;
+  text-align: center;
+  margin-bottom: 8px;
+  min-height: 48px;
+  color: #18181b;
+  line-height: 1.3;
 }
-.precos-produto {
+
+.price-container {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.7rem;
+  gap: 8px;
+  margin-bottom: 12px;
+  justify-content: center;
 }
-.preco-original {
+
+.original-price {
   color: #888;
   text-decoration: line-through;
   font-size: 1.08rem;
   font-weight: 500;
 }
-.preco-final {
+
+.final-price {
   color: #1b5e20;
   font-size: 1.25rem;
   font-weight: 700;
 }
+
+.action-buttons {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-cart-btn {
+  border: 2px solid #18181b;
+  color: #18181b;
+  background: transparent;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 44px;
+  min-width: 160px;
+  max-width: 160px;
+}
+
+.add-cart-btn:hover, .add-cart-btn:focus {
+  background: #18181b;
+  color: #fff;
+  border-color: #18181b;
+}
+
+.add-cart-btn i {
+  font-size: 1.2rem;
+  margin-right: 6px;
+}
+
 @media (max-width: 700px) {
   .product-card {
     min-width: 100%;
     max-width: 100%;
     min-height: 320px;
     max-height: 370px;
-    padding: 0.7rem;
+    padding: 6px;
   }
-  .card-img-top.object-fit-cover {
-    height: 120px !important;
+  
+  .product-image-container {
+    height: 120px;
+    margin-bottom: 8px;
   }
-  .card-title {
+  
+  .product-title {
     font-size: 1rem;
     min-height: 36px;
   }
-  .btn {
+  
+  .add-cart-btn {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+    width: 140px;
+    height: 40px;
+    min-width: 140px;
+    max-width: 140px;
+  }
+  
+  .add-cart-btn i {
+    font-size: 1.1rem;
+    margin-right: 4px;
+  }
+  
+  .official-badge {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+  
+  .discount-badge {
     font-size: 0.95rem;
-    padding: 0.5rem 0.75rem;
+    padding: 6px 10px;
   }
 }
 </style> 

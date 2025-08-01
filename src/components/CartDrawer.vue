@@ -159,20 +159,19 @@ function close() { cartDrawer.closeDrawer() }
 
 .cart-header .btn-close-lg {
   position: absolute;
-  right: 12px;
   top: 18px;
-  z-index: 3;
-  font-size: 1.2rem;
-  color: #e63946 !important;
-  opacity: 1;
-  background: transparent;
+  right: 12px;
+  background: none;
   border: none;
   padding: 0;
+  font-size: 1.2rem;
+  color: #e63946;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .custom-x-close svg {
   display: block;
   stroke: #e63946;
@@ -195,7 +194,6 @@ function close() { cartDrawer.closeDrawer() }
   align-items: center;
   margin-bottom: 12px;
   border: 1px solid #f0f0f0;
-  transition: none;
   min-height: 64px;
   max-height: 80px;
 }
@@ -220,16 +218,7 @@ function close() { cartDrawer.closeDrawer() }
   margin-bottom: 2px;
   font-weight: 700;
 }
-.cart-item-price {
-  font-size: 1.08rem;
-  color: #444;
-  margin-top: 0.1rem;
-  font-weight: 700;
-}
-.small.text-muted {
-  font-size: 0.92rem;
-  color: #888 !important;
-}
+
 .btn-remove {
   background: transparent;
   border: none;
@@ -239,10 +228,7 @@ function close() { cartDrawer.closeDrawer() }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  margin-left: 0.2rem;
   padding: 0;
-  transition: color 0.18s;
 }
 .btn-remove:hover {
   background: transparent;
@@ -252,12 +238,7 @@ function close() { cartDrawer.closeDrawer() }
   position: sticky;
   bottom: 0;
   background: #fff;
-  border-radius: 7px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  padding: 4px 4px 4px 4px;
-  margin-top: 0.2rem;
   text-align: center;
-  min-width: 0;
 }
 .cart-total-center {
   font-size: 0.93rem;
@@ -270,26 +251,6 @@ function close() { cartDrawer.closeDrawer() }
   border: none;
   color: #fff;
   font-size: 0.93rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  border-radius: 6px;
-  box-shadow: none;
-  padding: 0.32rem 0;
-  margin-top: 0.05rem;
-  transition: background 0.18s, color 0.18s;
-  min-height: 26px;
 }
-.cart-checkout-btn:hover {
-  background: #232323;
-  color: #fff;
-}
-.btn-close-lg {
-  font-size: 1.7rem;
-  color: #222;
-  opacity: 0.7;
-  transition: opacity 0.18s;
-}
-.btn-close-lg:hover {
-  opacity: 1;
-}
+
 </style> 

@@ -55,20 +55,20 @@ const categorias = [
 .dropdown-menu {
   min-width: 180px;
   border-radius: 0.7rem;
-  box-shadow: 0 2px 12px rgba(24,24,27,0.12);
-  background: #232323;
+ 
+  background: #ffffff;
   border: none;
   margin-top: 0.5rem;
 }
 .dropdown-item {
-  color: #fff;
+  color: #ffffff;
   font-size: 1rem;
   transition: background 0.2s, color 0.2s;
   border-radius: 0.5rem;
 }
 .dropdown-item:hover {
   background: #FFD600;
-  color: #18181b;
+  color: #ffffff;
 }
 @media (max-width: 991px) {
   .menu-categorias {

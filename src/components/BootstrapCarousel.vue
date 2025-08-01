@@ -1,120 +1,90 @@
 <template>
-  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-    <div class="carousel-indicators">
-      <button v-for="(banner, idx) in banners" :key="idx" type="button" :data-bs-target="'#mainCarousel'" :data-bs-slide-to="idx" :class="{active: idx === 0}" :aria-current="idx === 0 ? 'true' : undefined" :aria-label="'Slide ' + (idx+1)"></button>
-    </div>
-    <div class="carousel-inner rounded-4 shadow banner-carousel-fixed">
-      <div v-for="(banner, idx) in banners" :key="idx" class="carousel-item" :class="{active: idx === 0}">
-        <img :src="banner" class="d-block w-100 img-fluid banner-img" :alt="'Banner ' + (idx+1)">
+  <div class="custom-carousel">
+    <div class="carousel-inner">
+      <div
+        v-for="(banner, idx) in banners"
+        :key="idx"
+        class="carousel-item"
+        :class="{ active: idx === current }"
+      >
+        <img :src="banner" class="banner-img" :alt="'Banner ' + (idx+1)" />
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Próximo</span>
-    </button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import banner1 from '../assets/banner1.png'
 import banner2 from '../assets/banner2.png'
 import banner4carrose from '../assets/banner4carrose.png'
-import { Carousel } from 'bootstrap'
 
 const banners = [banner1, banner2, banner4carrose]
+const current = ref(0)
+let interval = null
 
-onMounted(() => {
-  const el = document.getElementById('mainCarousel')
-  if (el) {
-    new Carousel(el, {
-      interval: 5000,
-      ride: 'carousel',
-      wrap: true,
-      pause: false
-    })
-  }
-})
-function logSeta(tipo) {
-  console.log('Seta clicada:', tipo)
+function nextSlide() {
+  current.value = (current.value + 1) % banners.length
 }
-// Nenhuma lógica JS necessária, Bootstrap faz tudo
+function startAuto() {
+  interval = setInterval(() => {
+    nextSlide()
+  }, 5000)
+}
+function stopAuto() {
+  if (interval) clearInterval(interval)
+}
+onMounted(() => {
+  startAuto()
+})
+onUnmounted(() => {
+  stopAuto()
+})
 </script>
 
 <style scoped>
-.carousel-inner.banner-carousel-fixed {
+.custom-carousel {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.carousel-inner {
+  position: relative;
+  width: 100%;
   height: 340px;
 }
 .carousel-item {
-  height: 340px;
-  position: relative;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(.4,2,.3,1);
+  z-index: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-item.active {
+  opacity: 1;
+  z-index: 2;
+  pointer-events: auto;
 }
 .banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 16px;
   display: block;
-  margin: 0 auto;
-  transition: none !important;
-}
-.carousel-btn-fixed {
-  position: absolute;
-  left: 50%;
-  bottom: 2.2rem;
-  transform: translateX(-50%);
-  z-index: 10;
-  min-width: 150px;
-  text-align: center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.13);
-  font-size: 1.1rem;
-  padding: 0.7rem 1.6rem;
-}
-.carousel-control-prev, .carousel-control-next {
-  width: 60px;
-  height: 100%;
-  top: 0;
-  bottom: 0;
-  opacity: 0.85;
-  transition: opacity 0.18s;
-  z-index: 20;
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.carousel-control-prev:hover, .carousel-control-next:hover {
-  opacity: 1;
-  background: rgba(34,34,34,0.08);
-}
-.carousel-control-prev-icon, .carousel-control-next-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.13));
 }
 @media (max-width: 700px) {
-  .carousel-inner.banner-carousel-fixed {
+  .carousel-inner {
     height: 160px;
   }
   .carousel-item {
     height: 160px;
   }
   .banner-img {
-    height: 100%;
-  }
-  .carousel-btn-fixed {
-    bottom: 0.4rem;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 90px;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.7rem;
-    max-width: 90vw;
-    white-space: normal;
+    border-radius: 10px;
   }
 }
 </style> 
