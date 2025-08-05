@@ -5,7 +5,11 @@
       
       <div class="product-badges">
         <img v-if="product.escudo" :src="product.escudo" alt="Escudo" class="team-badge" />
-        <span v-if="activeDiscount" class="discount-badge">-{{ Number(activeDiscount.discount_percentage).toFixed(0) }}%</span>
+        <transition name="fade">
+          <span v-if="activeDiscount" class="discount-badge highlight-discount">
+            <i class="bi bi-cash-coin"></i> -{{ Number(activeDiscount.discount_percentage).toFixed(0) }}% OFF
+          </span>
+        </transition>
       </div>
       
       <span v-if="product.oficial" class="official-badge">Oficial</span>
@@ -18,9 +22,16 @@
     <div class="product-content">
       <h5 class="product-title">{{ product.name }}</h5>
       
-      <div class="price-container">
-        <span v-if="activeDiscount" class="original-price">R$ {{ Number(product.price).toFixed(2) }}</span>
-        <span class="final-price">R$ {{ precoComDesconto }}</span>
+      <div class="price-container price-center">
+        <template v-if="activeDiscount">
+          <div class="price-block">
+            <span class="original-price">De: <b>R$ {{ Number(product.price).toFixed(2) }}</b></span>
+            <span class="final-price price-with-discount">Por: <b>R$ {{ precoComDesconto }}</b></span>
+          </div>
+        </template>
+        <template v-else>
+          <span class="final-price">R$ {{ precoComDesconto }}</span>
+        </template>
       </div>
       
       <div class="action-buttons">
@@ -77,10 +88,8 @@ const precoComDesconto = computed(() => {
   box-shadow: var(--color-shadow);
   border-radius: 16px;
   transition: all 0.3s ease;
-  min-width: 240px;
-  max-width: 320px;
-  min-height: 410px;
-  max-height: 440px;
+  width: 270px;
+  height: 440px;
   margin: 0 auto 1.5rem auto;
   display: flex;
   flex-direction: column;
@@ -100,6 +109,13 @@ const precoComDesconto = computed(() => {
   margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.4s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
 .product-image {
@@ -134,71 +150,85 @@ const precoComDesconto = computed(() => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Badge de desconto destacado */
 .discount-badge {
-  background: #ff1744;
+  background: linear-gradient(90deg, #26b613 60%, #16dd70 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 1.05rem;
-  padding: 8px 12px;
+  font-weight: 900;
+  font-size: 1.18rem;
+  padding: 10px 18px;
   border-radius: 50px;
-  box-shadow: 0 2px 8px rgba(255,23,68,0.13);
   z-index: 4;
-}
-
-
-.details-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #fff;
-  border: 1.5px solid #18181b;
-  color: #18181b;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  letter-spacing: 0.03em;
+  border: 2px solid rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(179, 179, 179, 0.1);
-  transition: background 0.18s, color 0.18s, border 0.18s;
-  z-index: 3;
-  font-size: 1.2rem;
-  padding: 0;
-  cursor: pointer;
+  gap: 8px;
+  text-shadow: 0 2px 8px #0a0606a0;
+}
+.highlight-discount {
+  animation: pulse-discount 1.2s infinite alternate;
+}
+@keyframes pulse-discount {
+  0% { box-shadow: 0 0 0 0 #42424255; }
+  100% { box-shadow: 0 0 16px 6px #fd003333; }
 }
 
 
 .product-title {
-  font-size: 1.18rem;
+  font-size: 1.08rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 8px;
   min-height: 48px;
+  max-width: 220px;
   color: #18181b;
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
 }
 
 .price-container {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+  width: 100%;
   margin-bottom: 12px;
+  display: flex;
   justify-content: center;
 }
+.price-center {
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+}
+.price-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
 
+/* Preço original riscado */
 .original-price {
   color: #888;
   text-decoration: line-through;
   font-size: 1.08rem;
   font-weight: 500;
+  margin-right: 2px;
 }
-
 .final-price {
   color: #1b5e20;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 900;
+  margin-left: 2px;
 }
-
+.price-with-discount {
+  color: #0c5017;
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
 .action-buttons {
   margin-top: auto;
   width: 100%;
@@ -239,11 +269,13 @@ const precoComDesconto = computed(() => {
 
 @media (max-width: 700px) {
   .product-card {
-    min-width: 100%;
-    max-width: 100%;
-    min-height: 320px;
-    max-height: 370px;
+    width: 100%;
+    height: 370px;
     padding: 6px;
+    min-width: unset;
+    max-width: unset;
+    min-height: unset;
+    max-height: unset;
   }
   
   .product-image-container {

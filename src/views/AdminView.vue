@@ -15,9 +15,6 @@
         <button v-if="userRole==='ADMIN' || userRole==='MODERATOR'" class="nav-link sidebar-btn" :class="{active: tab==='pedidos'}" @click="tab='pedidos'">
           <i class="bi bi-bag-check me-2"></i> Pedidos
         </button>
-        <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='usuarios'}" @click="tab='usuarios'">
-          <i class="bi bi-people me-2"></i> Usuários
-        </button>
         <button v-if="userRole==='ADMIN'" class="nav-link sidebar-btn" :class="{active: tab==='cupons'}" @click="tab='cupons'">
           <i class="bi bi-ticket-perforated me-2"></i> Cupons
         </button>
@@ -42,13 +39,7 @@
                 <div class="kpi-label">Produtos</div>
               </div>
           </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="kpi-block-minimal text-center p-4 mb-2">
-              <i class="bi bi-people kpi-icon mb-2" style="color:#18181b !important;"></i>
-              <div class="kpi-value mb-1">{{ usuarios.length }}</div>
-                <div class="kpi-label">Usuários</div>
-              </div>
-          </div>
+          <!-- Bloco de Usuários removido do dashboard -->
           <div class="col-12 col-md-6 col-lg-3">
             <div class="kpi-block-minimal text-center p-4 mb-2">
               <i class="bi bi-bag-check kpi-icon mb-2" style="color:#18181b !important;"></i>
@@ -59,7 +50,7 @@
           <div class="col-12 col-md-6 col-lg-3">
             <div class="kpi-block-minimal text-center p-4 mb-2">
               <i class="bi bi-cash-coin kpi-icon mb-2" style="color:#18181b !important;"></i>
-              <div class="kpi-value mb-1">R$ {{ totalVendas.toFixed(2) }}</div>
+              <div class="kpi-value mb-1">{{ formatCurrency(totalVendas) }}</div>
                 <div class="kpi-label">Vendas</div>
               </div>
             </div>
@@ -219,96 +210,6 @@
                     <span v-if="produtoLoading" class="spinner-border spinner-border-sm me-2"></span>
                     Salvar
                   </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Usuários -->
-      <section v-else-if="tab==='usuarios' && userRole==='ADMIN'">
-        <div class="text-center mt-0 mb-1 position-relative">
-          <h4 class="fw-bold mb-0 dashboard-title-custom text-preto">Usuários do Sistema</h4>
-          <button class="btn btn-success btn-sm fw-bold position-absolute end-0 top-50 translate-middle-y me-2" style="right:0;" @click="openUserModal()">
-            <i class="bi bi-person-plus me-1 icon-amarelo"></i> Criar Moderador
-          </button>
-        </div>
-        <div class="card border-0 shadow-sm rounded-4 p-0 mb-4" style="background:#fff;">
-          <div class="table-responsive">
-            <table class="table align-middle mb-0">
-              <thead class="table-success">
-                <tr>
-                  <th>Nome</th>
-                  <th>Email</th>
-                  <th>Papel</th>
-                  <th class="text-end pe-4">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="usuariosLoading">
-                  <td colspan="4" class="text-center py-4">Carregando usuários...</td>
-                </tr>
-                <tr v-else-if="usuariosError">
-                  <td colspan="4" class="alert alert-danger text-center">{{ usuariosError }}</td>
-                </tr>
-                <tr v-else-if="!usuarios.length">
-                  <td colspan="4" class="text-center text-muted py-4">Nenhum usuário cadastrado ainda.</td>
-                </tr>
-                <tr v-else v-for="usuario in usuarios" :key="usuario.id">
-                  <td class="fw-semibold">{{ usuario.name }}</td>
-                  <td>{{ usuario.email }}</td>
-                  <td>
-                    <span class="badge" :class="{
-                      'bg-dark text-warning': usuario.role === 'ADMIN',
-                      'bg-warning text-dark': usuario.role === 'MODERATOR',
-                      'bg-light text-dark': usuario.role === 'CLIENT'
-                    }">{{ usuario.role }}</span>
-                  </td>
-                  <td class="text-end pe-4">
-                    <button class="btn btn-outline-primary btn-sm me-2" @click="openUserModal(usuario)" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-outline-danger btn-sm me-2" @click="removeUser(usuario)" title="Remover"><i class="bi bi-trash"></i></button>
-                    <button v-if="usuario.role !== 'ADMIN'" class="btn btn-outline-warning btn-sm" @click="toggleUserRole(usuario)" title="Alterar papel">
-                      <i class="bi bi-arrow-left-right"></i> Alterar Papel
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <!-- Modal Criar/Editar Moderador -->
-        <div v-if="showUserModal" class="modal-backdrop d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,0.15);z-index:1050;">
-          <div class="modal-dialog modal-dialog-centered w-100" style="max-width:440px;">
-            <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff; padding: 0 2rem; max-height:90vh; overflow-y:auto;">
-              <div class="modal-header border-0 rounded-top-4" style="background:#f8fafc; padding-top:2rem; padding-bottom:1rem; padding-left:0; padding-right:0;">
-                <h5 class="modal-title fw-semibold text-secondary-emphasis">{{ userEditando.id ? 'Editar Usuário' : 'Novo Moderador' }}</h5>
-                <button type="button" class="btn-close" @click="closeUserModal"></button>
-              </div>
-              <form @submit.prevent="salvarUser">
-                <div class="modal-body py-4 px-0">
-                  <div v-if="userError" class="alert alert-danger py-2 small mb-3">{{ userError }}</div>
-                  <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">Nome</label>
-                    <input v-model="userEditando.name" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Nome do usuário" />
-                  </div>
-                  <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">Email</label>
-                    <input v-model="userEditando.email" type="email" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Email" />
-                  </div>
-                  <div class="mb-4" v-if="!userEditando.id">
-                    <label class="form-label mb-1 text-secondary">Senha</label>
-                    <input v-model="userEditando.password" type="password" class="form-control bg-light border-0 rounded-3 form-control-lg" required placeholder="Senha" />
-                  </div>
-                  <div class="mb-4">
-                    <label class="form-label mb-1 text-secondary">Papel</label>
-                    <select v-model="userEditando.role" class="form-select bg-light border-0 rounded-3 form-control-lg" required>
-                      <option value="MODERATOR">Moderador</option>
-                      <option value="CLIENT">Cliente</option>
-                    </select>
-                  </div>
-                  <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary rounded-pill px-4" type="submit">Salvar</button>
-                  </div>
                 </div>
               </form>
             </div>
@@ -531,7 +432,6 @@
         </div>
       </section>
     </main>
-          </div>
   <!-- Modal de detalhes do pedido -->
   <div v-if="pedidoSelecionado" class="pedido-detalhes-modal">
     <div class="pedido-detalhes-card">
@@ -621,8 +521,9 @@
       </div>
     </div>
   </div>
-</template>
+  </div>
 
+ </template>
 <script setup>
 import { ref, computed, onMounted, watch, watchEffect } from 'vue'
 import { useProductsStore } from '@/stores/products'
@@ -694,7 +595,34 @@ const produtosLoading = computed(() => productsStore.loading)
 const produtosError = computed(() => productsStore.error)
 const pedidos = computed(() => ordersStore.orders)
 const cupons = computed(() => couponsStore.coupons)
-const totalVendas = computed(() => pedidos.value.reduce((acc, p) => acc + (p.valor || 0), 0))
+const totalVendas = computed(() => {
+  return pedidos.value.reduce((acc, p) => {
+    if (p.total) {
+      return acc + Number(p.total);
+    } else if (p.valor) {
+      return acc + Number(p.valor);
+    } else if (p.products && Array.isArray(p.products)) {
+      // Soma o valor dos produtos do pedido
+      let subtotal = p.products.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0);
+      // Aplica desconto se houver cupom
+      if (p.coupon && p.coupon.discount_percentage) {
+        subtotal = subtotal * (1 - (p.coupon.discount_percentage / 100));
+      } else if (p.coupon_id && cupons.value && cupons.value.length) {
+        const cupom = cupons.value.find(c => c.id === p.coupon_id);
+        if (cupom && cupom.discount_percentage) {
+          subtotal = subtotal * (1 - (cupom.discount_percentage / 100));
+        }
+      }
+      return acc + subtotal;
+    }
+    return acc;
+  }, 0);
+})
+
+function formatCurrency(valor) {
+  if (typeof valor === 'object' && valor.value !== undefined) valor = valor.value;
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
 const adminName = computed(() => authStore.user?.name || authStore.user?.email || 'Administrador')
 const auth = useAuthStore()
 const userRole = auth.role

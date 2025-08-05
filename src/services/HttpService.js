@@ -19,7 +19,6 @@ API.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const auth = useAuthStore()
       auth.logout()
-      // Remover window.location.href = '/login' para evitar loop de reload
     }
     return Promise.reject(error)
   }
@@ -27,232 +26,459 @@ API.interceptors.response.use(
 
 // ========== USER ==========
 export async function login(payload) {
-  return (await API.post('login', payload)).data
+  try {
+    return (await API.post('login', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function register(payload) {
-  return (await API.post('register', payload)).data
+  try {
+    return (await API.post('register', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function registerModerator(payload) {
-  return (await API.post('users/create-moderator', payload)).data
+  try {
+    return (await API.post('users/create-moderator', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getUser() {
-  return (await API.get('users/me')).data
+  try {
+    return (await API.get('users/me')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function changeUserInfos(payload) {
-  return (await API.put('users/me', payload)).data
+  try {
+    return (await API.put('users/me', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteUser() {
-  return (await API.delete('users/me')).data
+  try {
+    return (await API.delete('users/me')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function updatePFP(formData) {
-  return (await API.put('users/image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })).data
+  try {
+    return (await API.put('users/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== CATEGORIES ==========
 export async function registerCategories(payload) {
-  return (await API.post('categories/', payload, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })).data
+  try {
+    return (await API.post('categories/', payload, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getCategories() {
-  return (await API.get('categories/')).data
+  try {
+    return (await API.get('categories/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteCategorie(idCat) {
-  return (await API.delete(`categories/${idCat}`)).data
+  try {
+    return (await API.delete(`categories/${idCat}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
-export async function updateCategories(idCat, payd) {
-  return (await API.put(`categories/${idCat}`, payload)).data
+export async function updateCategories(idCat, payload) {
+  try {
+    return (await API.put(`categories/${idCat}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== SUBCATEGORIES ==========
 export async function createSubcategory(categoryId, payload) {
-  return (await API.post(`categories/${categoryId}/subcategories`, payload)).data
+  try {
+    return (await API.post(`categories/${categoryId}/subcategories`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getSubcategories(categoryId) {
-  return (await API.get(`categories/${categoryId}/subcategories`)).data
+  try {
+    return (await API.get(`categories/${categoryId}/subcategories`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function updateSubcategory(categoryId, subcategoryId, payload) {
-  return (await API.put(`categories/${categoryId}/subcategories/${subcategoryId}`, payload)).data
+  try {
+    return (await API.put(`categories/${categoryId}/subcategories/${subcategoryId}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteSubcategory(categoryId, subcategoryId) {
-  return (await API.delete(`categories/${categoryId}/subcategories/${subcategoryId}`)).data
+  try {
+    return (await API.delete(`categories/${categoryId}/subcategories/${subcategoryId}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== PRODUCTS ==========
 export async function createProducts(formData) {
-  return (await API.post('products/', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })).data
+  try {
+    return (await API.post('products/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getProducts(idCat) {
-  return (await API.get(`products/category/${idCat}`)).data
+  try {
+    return (await API.get(`products/category/${idCat}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getAllProducts() {
-  return (await API.get('products/')).data
+  try {
+    return (await API.get('products/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getProduct(idProd) {
-  return (await API.get(`products/${idProd}`)).data
+  try {
+    return (await API.get(`products/${idProd}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function updateProduct(idProd, payload) {
-  return (await API.put(`products/${idProd}`, payload)).data
+  try {
+    return (await API.put(`products/${idProd}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
+
 
 export async function updateStockProduct(idProd, payload) {
-  return (await API.put(`products/${idProd}/stock`, payload)).data
+  try {
+    return (await API.put(`products/${idProd}/stock`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
+
 
 export async function deleteProducts(idProd) {
-  return (await API.delete(`products/${idProd}`)).data
+  try {
+    return (await API.delete(`products/${idProd}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
+
 export async function getProductsByUser(userId) {
-  return (await API.get(`products/user/${userId}`)).data
+  try {
+    return (await API.get(`products/user/${userId}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== ADDRESSES ==========
+
 export async function getAddresses() {
-  return (await API.get('addresses/')).data
+  try {
+    return (await API.get('addresses/')).data
+  } catch (error) {
+    throw error
+  }
 }
+
 
 export async function getAddressByID(idAddress) {
-  return (await API.get(`addresses/${idAddress}`)).data
+  try {
+    return (await API.get(`addresses/${idAddress}`)).data
+  } catch (error) {
+    throw error
+  }
 }
+
 
 export async function createAddress(payload) {
-  return (await API.post('addresses/', payload)).data
+  try {
+    return (await API.post('addresses/', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
+
 export async function updateAddress(idAddress, payload) {
-  return (await API.put(`addresses/${idAddress}`, payload)).data
+  try {
+    return (await API.put(`addresses/${idAddress}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteAddresses(idAddress) {
-  return (await API.delete(`addresses/${idAddress}`)).data
+  try {
+    return (await API.delete(`addresses/${idAddress}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== CART ==========
 export async function createCart() {
-  return (await API.post('cart/')).data
+  try {
+    return (await API.post('cart/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getCart() {
-  return (await API.get('cart/')).data
+  try {
+    return (await API.get('cart/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getCartItems() {
-  return (await API.get('cart/items')).data
+  try {
+    return (await API.get('cart/items')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function addItems(payload) {
-  return (await API.post('cart/items', payload)).data
+  try {
+    return (await API.post('cart/items', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function updateQnt(payload) {
-  return (await API.put('cart/items', payload)).data
+  try {
+    return (await API.put('cart/items', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteInCart(data) {
-  return (await API.delete('cart/items', { data })).data
+  try {
+    return (await API.delete('cart/items', { data })).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function clearCartItems() {
-  return (await API.delete('cart/clear')).data
+  try {
+    return (await API.delete('cart/clear')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== COUPONS ==========
 export async function newCoupon(payload) {
-  return (await API.post('coupons/', payload)).data
+  try {
+    return (await API.post('coupons/', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getCoupons() {
-  return (await API.get('coupons/')).data
+  try {
+    return (await API.get('coupons/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function updateCoupon(couponID, payload) {
-  return (await API.put(`coupons/${couponID}`, payload)).data
+  try {
+    return (await API.put(`coupons/${couponID}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getCouponsByID(couponID) {
-  return (await API.get(`coupons/${couponID}`)).data
+  try {
+    return (await API.get(`coupons/${couponID}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteCoupon(couponID) {
-  return (await API.delete(`coupons/${couponID}`)).data
+  try {
+    return (await API.delete(`coupons/${couponID}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== ORDERS ==========
 export async function newOrder(payload) {
-  return (await API.post('orders/', payload)).data
+  try {
+    return (await API.post('orders/', payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getOrders() {
-  return (await API.get('orders/')).data
+  try {
+    return (await API.get('orders/')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getOrderById(orderID) {
-  return (await API.get(`orders/${orderID}`)).data
+  try {
+    return (await API.get(`orders/${orderID}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function changeOrderStatus(orderID, payload) {
-  return (await API.put(`orders/${orderID}`, payload)).data
+  try {
+    return (await API.put(`orders/${orderID}`, payload)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getClientOrders(clientId) {
-  return (await API.get(`orders/all/${clientId}`)).data
+  try {
+    return (await API.get(`orders/all/${clientId}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function cancelOrder(orderID) {
-  return (await API.delete(`orders/${orderID}`)).data
-} 
+  try {
+    return (await API.delete(`orders/${orderID}`)).data
+  } catch (error) {
+    throw error
+  }
+}
 
 export async function getAllOrders() {
-  return (await API.get('orders/all')).data
+  try {
+    return (await API.get('orders/all')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getAllOrdersByAdmin(adminId) {
-  return (await API.get(`orders/all/${adminId}`)).data
+  try {
+    return (await API.get(`orders/all/${adminId}`)).data
+  } catch (error) {
+    throw error
+  }
 }
 
 // ========== AUTH TOKEN ==========
 export async function renewToken() {
-  return (await API.post('renew-token')).data
+  try {
+    return (await API.post('renew-token')).data
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function verifyToken() {
-  return (await API.get('verify-token')).data
+  try {
+    return (await API.get('verify-token')).data
+  } catch (error) {
+    throw error
+  }
 } 
 
 // ========== DESCONTOS ==========
 export async function getDiscounts() {
-  return await API.get('/discounts/').then(r => r.data)
+  try {
+    return await API.get('/discounts/').then(r => r.data)
+  } catch (error) {
+    throw error
+  }
 }
 export async function getDiscountById(id) {
-  return await API.get(`/discounts/${id}`).then(r => r.data)
+  try {
+    return await API.get(`/discounts/${id}`).then(r => r.data)
+  } catch (error) {
+    throw error
+  }
 }
 export async function createDiscount(payload) {
-  return await API.post('/discounts/', payload).then(r => r.data)
+  try {
+    return await API.post('/discounts/', payload).then(r => r.data)
+  } catch (error) {
+    throw error
+  }
 }
 export async function updateDiscount(id, payload) {
-  return await API.put(`/discounts/${id}`, payload).then(r => r.data)
+  try {
+    return await API.put(`/discounts/${id}`, payload).then(r => r.data)
+  } catch (error) {
+    throw error
+  }
 }
 export async function deleteDiscount(id) {
-  return await API.delete(`/discounts/${id}`)
-} 
+  try {
+    return await API.delete(`/discounts/${id}`)
+  } catch (error) {
+    throw error
+  }
+}
