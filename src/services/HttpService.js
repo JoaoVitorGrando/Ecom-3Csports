@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth' //
 
+// Instância compartilhada do Axios para centralizar baseURL e interceptors
 const API = axios.create({
   baseURL: 'http://35.196.79.227:8000/'
 })
@@ -84,6 +85,7 @@ export async function updatePFP(formData) {
 }
 
 // ========== CATEGORIES ==========
+// registerCategories: POST multipart para criar categoria com imagem
 export async function registerCategories(payload) {
   try {
     return (await API.post('categories/', payload, {
@@ -152,10 +154,11 @@ export async function deleteSubcategory(categoryId, subcategoryId) {
 }
 
 // ========== PRODUCTS ==========
-export async function createProducts(formData) {
-  try {
-    return (await API.post('products/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+
+export async function createProducts(formData) { 
+  try { 
+    return (await API.post('products/', formData, {  
+      headers: { 'Content-Type': 'multipart/form-data' }  
     })).data
   } catch (error) {
     throw error
@@ -164,9 +167,9 @@ export async function createProducts(formData) {
 
 export async function getProducts(idCat) {
   try {
-    return (await API.get(`products/category/${idCat}`)).data
-  } catch (error) {
-    throw error
+    return (await API.get(`products/category/${idCat}`)).data   
+  } catch (error) {  
+    throw error 
   }
 }
 
@@ -267,6 +270,7 @@ export async function deleteAddresses(idAddress) {
 }
 
 // ========== CART ==========
+// createCart/getCart garantem carrinho associado ao usuário autenticado
 export async function createCart() {
   try {
     return (await API.post('cart/')).data
@@ -328,7 +332,7 @@ export async function newCoupon(payload) {
   try {
     return (await API.post('coupons/', payload)).data
   } catch (error) {
-    throw error
+    throw error 
   }
 }
 
@@ -365,6 +369,7 @@ export async function deleteCoupon(couponID) {
 }
 
 // ========== ORDERS ==========
+// newOrder: POST /orders/ { address_id, coupon_id? }
 export async function newOrder(payload) {
   try {
     return (await API.post('orders/', payload)).data

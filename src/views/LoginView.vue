@@ -11,14 +11,14 @@
       <form @submit.prevent="handleLogin" class="login-form" novalidate>
         <div class="form-group">
           <label for="email" class="form-label">
-            E-mail <span class="required">*</span>
-          </label>
-          <div class="input-wrapper">
+            E-mail <span class="required">*</span>   
+          </label>  
+          <div class="input-wrapper">  
             <input 
-              v-model="email" 
+              v-model="email"  
               type="email" 
               class="form-input" 
-              :class="{ 'error': emailError, 'success': emailValid }"
+              :class="{ 'error': emailError, 'success': emailValid }" 
               id="email" 
               name="email"
               placeholder="Digite seu e-mail"
@@ -33,7 +33,7 @@
           </div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group"> 
           <label for="password" class="form-label">
             Senha <span class="required">*</span>
           </label>

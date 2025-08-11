@@ -81,6 +81,7 @@ import { useAuthStore } from '@/stores/auth'
 import { showToast } from '@/utils/toast'
 import ProductCard from '@/components/ProductCard.vue'
 
+// Helper para montar URL da imagem vinda da API
 function getImage(path) {
   if (!path) return '/default-product.png'
   if (path.startsWith('http')) return path
@@ -98,6 +99,7 @@ const selectedSize = ref('M')
 const showMsg = ref(false)
 const relatedIndex = ref(0)
 
+// Produtos relacionados por categoria (exclui o próprio produto)
 const relatedProducts = computed(() => {
   if (!product.value?.category?.name) return []
   return productsStore.products
@@ -105,6 +107,7 @@ const relatedProducts = computed(() => {
     .slice(0, 4)
 })
 
+// Ao montar, busca o produto atual e carrega lista para relacionados, se necessário
 onMounted(async () => {
   try {
     product.value = await productsStore.fetchProduct(route.params.id)
@@ -116,16 +119,19 @@ onMounted(async () => {
   }
 })
 
+// Preço “de” (só para efeito visual), calculado como 38% acima do atual
 const precoAntigo = computed(() => {
   if (!product.value.price) return null
   return (Number(product.value.price) * 1.38).toFixed(2)
 })
 
+// Valor da parcela em 12x sem juros (exibição)
 const parcela12x = computed(() => {
   if (!product.value.price) return '0,00'
   return (Number(product.value.price) / 12).toFixed(2)
 })
 
+// Adiciona o produto ao carrinho (requer autenticação)
 async function addToCart() {
   if (!auth.token) {
     showToast('Faça login para adicionar produtos ao carrinho.', 'warning')
@@ -142,6 +148,7 @@ async function addToCart() {
   }
 }
 
+// Adiciona um item relacionado ao carrinho
 async function addRelatedToCart(produto) {
   if (!auth.token) {
     showToast('Faça login para adicionar produtos ao carrinho.', 'warning')
@@ -156,14 +163,17 @@ async function addRelatedToCart(produto) {
   }
 }
 
+// Navegação do carrossel de relacionados (anterior)
 function prevRelated() {
   if (relatedIndex.value > 0) relatedIndex.value--
 }
 
+// Navegação do carrossel de relacionados (próximo)
 function nextRelated() {
   if (relatedIndex.value < relatedProducts.value.length - 1) relatedIndex.value++
 }
 
+// Reseta o índice ao mudar a lista de relacionados
 watch(relatedProducts, () => { relatedIndex.value = 0 })
 </script>
 

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { createCart, getCart, getCartItems, addItems, updateQnt, deleteInCart, clearCartItems } from '../services/HttpService'
 import { useAuthStore } from './auth'
 
-export const useCartStore = defineStore('cart', {
+export const useCartStore = defineStore('cart', { 
   state: () => ({
     cart: null,
     items: [],
@@ -10,9 +10,10 @@ export const useCartStore = defineStore('cart', {
     error: ''
   }),
   actions: {
-    async ensureCart() {
+    // Garante que o usuário autenticado possua um carrinho (cria se 404)
+    async ensureCart() { 
       const authStore = useAuthStore()
-      if (!authStore.token) return // Não tenta buscar/criar carrinho se não autenticado
+      if (!authStore.token) return
       try {
         this.cart = await getCart()
       } catch (e) {
@@ -23,7 +24,8 @@ export const useCartStore = defineStore('cart', {
         }
       }
     },
-    async fetchItems() {
+    // Busca os itens do carrinho do usuário logado
+    async fetchItems() { 
       const authStore = useAuthStore()
       if (!authStore.token) {
         this.items = []
@@ -31,9 +33,9 @@ export const useCartStore = defineStore('cart', {
         return
       }
       this.loading = true
-      try {
-        await this.ensureCart()
-        const response = await getCartItems()
+      try { 
+        await this.ensureCart() 
+        const response = await getCartItems() 
         this.items = Array.isArray(response.items) ? response.items : []
         this.error = ''
       } catch (e) {
@@ -42,20 +44,22 @@ export const useCartStore = defineStore('cart', {
         this.loading = false
       }
     },
-    async addItem(product, quantity = 1, size = 'M') {
+    // Adiciona um item ao carrinho com tamanho e preço unitário
+    async addItem(product, quantity = 1, size = 'M') {  
       await this.ensureCart()
       return await addItems({ product_id: product.id, quantity, unit_price: Number(product.price), size })
     },
-    async updateItem(product_id, quantity) {
+    // Atualiza a quantidade de um item no carrinho
+    async updateItem(product_id, quantity) { 
       await this.ensureCart()
       return await updateQnt({ product_id, quantity })
     },
-    async removeItem(product_id) {
+    async removeItem(product_id) { // Remove um item do carrinho
       await this.ensureCart()
       await deleteInCart({ product_id })
       await this.fetchItems()
     },
-    async clearItems() {
+    async clearItems() { // Limpa o carrinho
       await this.ensureCart()
       return await clearCartItems()
     }

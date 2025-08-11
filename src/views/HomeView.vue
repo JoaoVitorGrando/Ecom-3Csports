@@ -106,7 +106,7 @@
           </div>
         </div>
       </section>
-      <!-- Institucional Minimalista -->
+      
       <section class="institucional-minimalista py-4 text-center bg-light rounded-4 mt-4 mb-0" style="max-width:900px;margin:40px auto 0 auto;">
         <h4 class="fw-bold mb-2">Sobre a 3C Sports</h4>
         <p class="mb-2">Loja de materiais esportivos: camisetas, acessórios, produtos oficiais dos maiores clubes, itens para academia, corrida e muito mais. Lançamentos exclusivos, ofertas imperdíveis, entrega rápida e atendimento humanizado.</p>
@@ -120,7 +120,7 @@
 <script setup>
 import MenuCategorias from '../components/MenuCategorias.vue'
 import ClubesCarousel from '../components/ClubesCarousel.vue'
-import BootstrapCarousel from '../components/BootstrapCarousel.vue'
+import BootstrapCarousel from '../components/Carousel.vue'
 import ProductCard from '../components/ProductCard.vue'
 import Vantagens from '../components/Vantagens.vue'
 import Depoimentos from '../components/Depoimentos.vue'

@@ -1,12 +1,12 @@
 <template>
-  <div class="custom-carousel">
-    <div class="carousel-inner">
-      <div
-        v-for="(banner, idx) in banners"
+  <div class="custom-carousel"> 
+    <div class="carousel-inner"> 
+      <div 
+        v-for="(banner, idx) in banners" 
         :key="idx"
         class="carousel-item"
-        :class="{ active: idx === current }"
-      >
+        :class="{ active: idx === current }" 
+      > 
         <img :src="banner" class="banner-img" :alt="'Banner ' + (idx+1)" />
       </div>
     </div>
@@ -14,19 +14,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue' 
 import banner1 from '../assets/banner1.png'
 import banner2 from '../assets/banner2.png'
-import banner4carrose from '../assets/banner4carrose.png'
+import banner4 from '../assets/banner4.png'
 
-const banners = [banner1, banner2, banner4carrose]
+const banners = [banner1, banner2, banner4]
 const current = ref(0)
 let interval = null
 
 function nextSlide() {
   current.value = (current.value + 1) % banners.length
 }
-function startAuto() {
+function startAuto() { 
   interval = setInterval(() => {
     nextSlide()
   }, 5000)

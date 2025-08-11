@@ -15,7 +15,8 @@ export const useAuthStore = defineStore('auth', {
     role: localStorage.getItem('role') || ''
   }),
   actions: {
-    async login(email, senha) {
+    // Realiza login via API e persiste credenciais/usuário no localStorage
+    async login(email, senha) { 
       const data = await loginApi({ email, password: senha })
       this.token = data.token
       this.user = data.user
@@ -46,6 +47,7 @@ export const useAuthStore = defineStore('auth', {
         cartStore.clearItems().catch(() => {})
       }
     },
+    // Busca o perfil do usuário autenticado (GET /users/me)
     async fetchProfile() {
       const data = await getUser()
       this.user = data

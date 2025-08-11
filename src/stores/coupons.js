@@ -8,6 +8,7 @@ export const useCouponsStore = defineStore('coupons', {
     error: ''
   }),
   actions: {
+    // Lista cupons 
     async fetchCoupons() {
       this.loading = true
       try {
@@ -19,6 +20,7 @@ export const useCouponsStore = defineStore('coupons', {
         this.loading = false
       }
     },
+    // Busca cupom por id 
     async fetchCoupon(id) {
       return await getCouponsByID(id)
     },

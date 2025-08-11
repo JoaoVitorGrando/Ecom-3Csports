@@ -8,6 +8,7 @@ export const useProductsStore = defineStore('products', {
     error: ''
   }),
   actions: {
+    // Busca todos os produtos
     async fetchProducts() {
       this.loading = true
       try {
@@ -19,6 +20,7 @@ export const useProductsStore = defineStore('products', {
         this.loading = false
       }
     },
+    // Busca um produto específico 
     async fetchProduct(id) {
       return await getProduct(id)
     },
@@ -31,6 +33,7 @@ export const useProductsStore = defineStore('products', {
     async deleteProduct(id) {
       return await deleteProducts(id)
     },
+    // Lista produtos by id user
     async fetchProductsByUser(userId) {
       this.loading = true
       try {

@@ -2,6 +2,7 @@
   <section class="depoimentos">
     <h2 class="depo-title">O que falam sobre nós</h2>
     <div class="depoimentos-grid">
+      <!-- Loop de depoimentos -->
       <div class="depo-card" v-for="depo in depoimentos" :key="depo.nome">
         <div class="depo-stars">
           <i class="bi bi-star-fill" v-for="n in 5" :key="n"></i>
@@ -34,7 +35,7 @@ const depoimentos = [
 }
 .depo-title {
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 3rem;
   text-align: center;
   margin-bottom: 2rem;
   color: #18181b;

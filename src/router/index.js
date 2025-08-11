@@ -6,12 +6,12 @@ import ProdutosView from '../views/ProdutosView.vue'
 import AdminView from '../views/AdminView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import PerfilView from '../views/PerfilView.vue'
-import CartView from '../views/CartView.vue'
+import CartView from '../views/CartView.vue' 
 import ModeratorView from '../views/ModeratorView.vue'
-// Componente para página não encontrada (crie depois)
+// Componente para página não encontrada (criar depois)
 const NotFoundView = { template: '<div>Página não encontrada</div>' }
 
-// Função utilitária para obter usuário do localStorage
+// Função para obter usuário do localStorage
 function getUser() {
   try {
     return JSON.parse(localStorage.getItem('user'))

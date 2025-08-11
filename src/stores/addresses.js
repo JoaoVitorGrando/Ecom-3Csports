@@ -8,6 +8,7 @@ export const useAddressesStore = defineStore('addresses', {
     error: ''
   }),
   actions: {
+    // Lista endereços do usuário autenticado 
     async fetchAddresses() {
       this.loading = true
       try {
@@ -19,6 +20,7 @@ export const useAddressesStore = defineStore('addresses', {
         this.loading = false
       }
     },
+    // Busca um endereço por id 
     async fetchAddress(id) {
       return await getAddressByID(id)
     },
